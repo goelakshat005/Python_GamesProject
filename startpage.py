@@ -172,16 +172,18 @@ class Player(Gameresult):
 		level_ok = False
 		levels = {'1':'easy', '2':'medium', '3':'hard'}
 		while not level_ok:
-			print("Enter the level of difficulty you want: \n")
+			print("Enter the level of difficulty you want: ")
 			for key, level in levels.items():
 				print("{}. {}".format(key, level))
-			print("\n")
-			difficulty_level = levels[input()]
+
+			difficulty_level = input()
 			if difficulty_level in levels:
+				print("difficulty_level: ", levels[difficulty_level])
 				level_ok = True
 			else:
 				print("Wrong choice, choose again.\n")
 
+		difficulty_level = levels[difficulty_level]
 		play_again = True
 		while play_again:
 			hangman_play = Hangman(usertype, difficulty_level)
