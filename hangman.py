@@ -13,7 +13,7 @@ class Hangman():
 
 		if self.gametype == "multi":
 			while True:
-				self.random_name = input("Please enter word for {} to guess (word should be greater than or equal to 3 letters, don't include spaces for your own sake, lol): ".format(name))
+				self.random_name = input("Please enter word for {} to guess (word should be greater than or equal to 3 letters): ".format(name))
 				if self.random_name.isspace() == False and len(self.random_name) >= 3:
 					break
 				print("Please enter a valid word!")
