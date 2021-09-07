@@ -27,7 +27,6 @@ SQL_QUERY_CHECK_USER_DETAILS = r"""
 	AND password = '{password}'
 """
 
-
 class Optionhangman(Multiplayer, Difficulty):
 	def __init__(self):
 		pass
@@ -71,8 +70,9 @@ class Optionhangman(Multiplayer, Difficulty):
 					return
 
 				if usertype != 'guest':
-					super().update_results(username, 'hangman', difficulty_level, result)
-					super().display_user_game_details(username, 'hangman')
+					gameresult_instance = Gameresult()
+					gameresult_instance.update_results(username, 'hangman', difficulty_level, result)
+					gameresult_instance.display_user_game_details(username, 'hangman')
 				if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
 					play_again = False
 

@@ -3,10 +3,10 @@ import random
 class Hangman():
 	avail_letters = 'abcdefghijklmnopqrstuvwxyz'
 	random_names = {'fruit': ['lemon', 'mango', 'apple', 'carrot', 'peach', 'grapes', 'orange'], 
-					'country': ['china', 'turkey', 'india', 'nepal', 'britian', 'bhutan', 'cuba', 'mexico', 'spain', 'russia', 'france'],
+					'country': ['china', 'turkey', 'india', 'nepal', 'britian', 'bhutan', 'cuba', 'mexico', 'spain', 'russia', 'france', 'south korea'],
 					'furniture': ['table', 'chair', 'stool', 'sofa', 'almirah', 'door', 'grill', 'panel']}   # can also create csv file for the same and then import here
 
-	turns = {'easy': 5, 'medium': 3, 'hard' : 2}
+	turns_diff = {'easy': 5, 'medium': 3, 'hard' : 2}
 
 	def __init__(self, usertype, gametype, difficulty_level, name=''):
 		self.gametype = gametype
@@ -27,12 +27,23 @@ class Hangman():
 		elif gametype == "single":
 			self.random_key = random.choice(list(self.random_names.keys()))
 			self.random_name = random.choice(self.random_names[self.random_key])
+			self.random_name = " ".join((self.random_name).split())
 
 		self.difficulty_level = difficulty_level		
-		self.turns = self.turns[self.difficulty_level] + len(self.random_name)
 
-		self.guessed_letters = '' 
-		self.name_while_guess = (("_ "*len(self.random_name)).strip()).split(" ")
+		self.guessed_letters = ''
+		self.name_while_guess = []
+		turns = 0
+		words = self.random_name.split(" ")
+		for word in words:
+			turns += len(word)
+			dashes = "_"*len(word)
+			dashes_list = list(dashes)
+			self.name_while_guess += dashes_list
+			self.name_while_guess.append(" ")
+		self.name_while_guess.pop()
+
+		self.turns = self.turns_diff[self.difficulty_level] + turns
 
 	def return_if_guessing_possible(self, letter_guessed):
 		if letter_guessed in self.avail_letters and len(letter_guessed) == 1:
@@ -53,7 +64,8 @@ class Hangman():
 		return False
 
 	def display_to_user(self):
-		print("\nThe word is of {} letters, number of guesses you have are: {}. [Hint: {}]".format(len(self.random_name), self.turns, self.random_key))
+		print("\nThe word is of {} letters, number of guesses you have are: {}. [Hint: {}]".
+			format(self.turns-self.turns_diff[self.difficulty_level], self.turns, self.random_key))
 		print(' '.join(self.name_while_guess))
 
 		while self.turns > 0:
@@ -78,6 +90,7 @@ class Hangman():
 						print("You entered the right choice!")
 			
 						if "_" not in self.name_while_guess:
+							print("The word is: ", self.random_name)
 							print("\nCONGRATULATIONS, YOU WON! WOOHOO!")
 							return 'won', self.difficulty_level
 					else:
@@ -103,6 +116,7 @@ if __name__ == '__main__':
 
 
 # to add later - 
+# hangman name with space in between, show properly to user and process accordingly (eg. south korea)
 # login user maintaining prev scores and all (parent class)  -- done
 # play again option.  -- done
 # add timer  -- done
@@ -133,7 +147,6 @@ if __name__ == '__main__':
 # change random function in hangman to make truly random
 # can create a constants file if useful
 # write test cases if possible
-# hangman name with space in between, show properly to user and process accordingly (eg. south korea)
 
 # rock papers scissors
 # tic tac toe  # only 2 players

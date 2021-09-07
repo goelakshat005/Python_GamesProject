@@ -20,7 +20,7 @@ class Multiplayer():
 		self.player2score_won = 0
 		self.player2score_lost = 0
 
-	def checkgametype(self):                           # check if 2 palyer game or single player 
+	def checkgametype(self):                           # check if 2 player game or single player 
 		print("Do you want to play:\n1. Single Player\n2. Multi Player\n3. Back")
 		while True:
 			gametype = input()
@@ -43,4 +43,5 @@ class Multiplayer():
 				self.player2score_lost += 1
 
 	def displayscores(self):
-		print("The scores are:\n1. {}'s score: Won - {}, Lost - {}\n2. {}'s score: Won - {}, Lost - {}".format(self.player1, self.player1score_won, self.player1score_lost, self.player2, self.player2score_won, self.player2score_lost))
+		print("The scores are:\n1. {}'s score: Won - {}, Lost - {}\n2. {}'s score: Won - {}, Lost - {}".
+			format(self.player1, self.player1score_won, self.player1score_lost, self.player2, self.player2score_won, self.player2score_lost))

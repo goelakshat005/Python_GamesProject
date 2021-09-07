@@ -1,4 +1,6 @@
 import pandas as pd
+from db_engines import DBEngines
+from settings import DATABASES
 
 SQL_QUERY_CHECK_USER_ALL_GAME_DETAILS = r"""
 	SELECT * FROM {user_game_details_table}
@@ -28,7 +30,8 @@ SQL_QUERY_UPDATE_USER_GAME_DETAILS = r"""
 class Gameresult:
 	
 	def __init__(self):
-		pass
+		self.db_engines = DBEngines.get_instance()
+		self.games_db_engine = self.db_engines.get_engine(DATABASES['default'])
 
 	def update_results(self, username, game, difficulty, result):
 		exists = self.check_user_game_details(username, game)
@@ -121,5 +124,6 @@ class Gameresult:
 					games.append(game)
 				print('{} -  Games Won: {}, Games Lost: {}'.format(df.iloc[i]['difficulty'].capitalize(), df.iloc[i]['games_won'], df.iloc[i]['games_lost']))
 			print("\n")
+
 	def __str__(self):
 		print("Game Results!")
