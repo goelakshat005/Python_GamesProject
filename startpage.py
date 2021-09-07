@@ -8,6 +8,8 @@ import stdiomask
 
 from hangman import Hangman
 from game_results import Gameresult
+from multiplayer import Multiplayer
+from difficulty import Difficulty
 
 SQL_QUERY_CHECK_USERNAME_DETAILS = r"""
 	SELECT * FROM {user_details_table}
@@ -24,6 +26,60 @@ SQL_QUERY_CHECK_USER_DETAILS = r"""
 	WHERE username = '{username}' 
 	AND password = '{password}'
 """
+
+
+class Optionhangman(Multiplayer, Difficulty):
+	def __init__(self):
+		pass
+
+	def hangman_option(self, usertype, username):  # TODO - can this function somehow become common for all games????
+		play_again = True
+		while play_again:
+			gametype = super().checkgametype()  # can be single, multi, or back option
+			if gametype in ["single", "multi"]:
+				self.gametype = gametype
+
+			if gametype == "multi":
+				difficulty_level = super().getdifficultylevel()
+				multi_instance = Multiplayer()
+				while True:
+					players = ['player1', 'player2']
+					for player in players:
+						if player == "player1":
+							name = multi_instance.player1
+							print("{} playing first.".format(multi_instance.player1))
+						else:
+							name = multi_instance.player2
+							print("{} playing now.".format(multi_instance.player2))
+						try:  # since we need to take care of back option as well , can use if else by calling class variables but not recommended, 
+						# also since self.gametype is not assigned when back option is chosen so will give error
+							play = Hangman(usertype, self.gametype, difficulty_level, name)
+							result, difficulty_level = play.display_to_user()   
+						except:
+							return
+						multi_instance.updatescores(player, result)
+					multi_instance.displayscores()
+					if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
+						return
+
+			elif gametype == "single":
+				difficulty_level = super().getdifficultylevel()
+				hangman_play = Hangman(usertype, self.gametype, difficulty_level)
+				try:  # since we need to take care of back option as well , can use if else by calling class variables but not recommended
+					result, difficulty_level = hangman_play.display_to_user()   
+				except:
+					return
+
+				if usertype != 'guest':
+					super().update_results(username, 'hangman', difficulty_level, result)
+					super().display_user_game_details(username, 'hangman')
+				if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
+					play_again = False
+
+			else:
+				play_again = False
+
+		return
 
 class Player(Gameresult):
 	available_games = ["hangman"]
@@ -122,7 +178,7 @@ class Player(Gameresult):
 			usertype = ''
 			username = ''
 			while not entered:
-				option = input("Please choose an option:\n1. Login (If existing user)\n2. Signup\n3. Play as a guest\n4. Exit\n\n")
+				option = input("Please choose an option:\n1. Login (If existing user)\n2. Signup\n3. Play as a guest\n4. Exit\n")
 				options = {"1":"login", "2":"signup","3":"guest","4":"exit"}
 				if option in options:
 					entered = True
@@ -156,7 +212,8 @@ class Player(Gameresult):
 					print("Invalid option! Choose again.\n")
 
 			if option == '1':
-				self.hangman_option(usertype, username)
+				choice = Optionhangman()
+				choice.hangman_option(usertype, username)
 
 			elif option == '2' and usertype != 'guest':
 				super().display_game_results_options(self.available_games, username)
@@ -165,36 +222,8 @@ class Player(Gameresult):
 				return
 
 			else:
-				print("You are not a user, please select again or login to keep a track of your records!\n")
+				print("You are not a user, please select again or signup to keep a track of your records!\n")
 				continue
-
-	def hangman_option(self, usertype, username):  # TODO - can this function somehow become common for all games????
-		level_ok = False
-		levels = {'1':'easy', '2':'medium', '3':'hard'}
-		while not level_ok:
-			print("Enter the level of difficulty you want: ")
-			for key, level in levels.items():
-				print("{}. {}".format(key, level))
-
-			difficulty_level = input()
-			if difficulty_level in levels:
-				print("difficulty_level: ", levels[difficulty_level])
-				level_ok = True
-			else:
-				print("Wrong choice, choose again.\n")
-
-		difficulty_level = levels[difficulty_level]
-		play_again = True
-		while play_again:
-			hangman_play = Hangman(usertype, difficulty_level)
-			result = hangman_play.display_to_user()
-			if usertype != 'guest':
-				super().update_results(username, 'hangman', difficulty_level, result)
-				super().display_user_game_details(username, 'hangman')
-			if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
-				play_again = False
-
-		return
 
 	def __str__(self):
 		print("Start Page!")

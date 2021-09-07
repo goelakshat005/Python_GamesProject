@@ -90,7 +90,8 @@ class Gameresult:
 				print(int(idx)+2, 'Back')
 
 				option = input()
-				if option in games:
+				print(option)
+				if option in games_dict:
 					sql_query = SQL_QUERY_CHECK_USER_IN_GAME_DETAILS.format(
 								user_game_details_table='user_game_details',
 								username=username,
@@ -111,9 +112,14 @@ class Gameresult:
 					continue
 
 			df = pd.read_sql(sql=sql_query, con=self.games_db_engine)
-			print("\nYour scores are: \n")
+			print("\nYour scores are:")
+			games = []
 			for i in range(len(df)):
-				print('{} -  Games Won: {}, Games Lost: {}'.format(df.iloc[i]['difficulty'], df.iloc[i]['games_won'], df.iloc[i]['games_lost']))
-
+				game = df['game'][0]
+				if game not in games:
+					print("{}-".format(game.capitalize()))
+					games.append(game)
+				print('{} -  Games Won: {}, Games Lost: {}'.format(df.iloc[i]['difficulty'].capitalize(), df.iloc[i]['games_won'], df.iloc[i]['games_lost']))
+			print("\n")
 	def __str__(self):
 		print("Game Results!")

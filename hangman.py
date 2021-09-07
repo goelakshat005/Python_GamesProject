@@ -8,10 +8,28 @@ class Hangman():
 
 	turns = {'easy': 5, 'medium': 3, 'hard' : 2}
 
-	def __init__(self, usertype, difficulty_level):
-		self.random_key = random.choice(list(self.random_names.keys()))
-		self.random_name = random.choice(self.random_names[self.random_key])		
-		self.turns = self.turns[difficulty_level] + len(self.random_name)
+	def __init__(self, usertype, gametype, difficulty_level, name=''):
+		self.gametype = gametype
+
+		if self.gametype == "multi":
+			while True:
+				self.random_name = input("Please enter word for {} to guess (don't include spaces for your own sake, lol): ".format(name))
+				if self.random_name.isspace() == False:
+					break
+				print("Please enter a valid word!")
+
+			while True:
+				self.random_key = input("Please enter a hint for {}: ".format(name))
+				if self.random_key.isspace() == False:
+					break
+				print("Please enter a valid hint!")
+
+		elif gametype == "single":
+			self.random_key = random.choice(list(self.random_names.keys()))
+			self.random_name = random.choice(self.random_names[self.random_key])
+
+		self.difficulty_level = difficulty_level		
+		self.turns = self.turns[self.difficulty_level] + len(self.random_name)
 
 		self.guessed_letters = '' 
 		self.name_while_guess = (("_ "*len(self.random_name)).strip()).split(" ")
@@ -35,7 +53,7 @@ class Hangman():
 		return False
 
 	def display_to_user(self):
-		print("\nThe word is of {} letters, number of guesses you have are: {}. [Hint: It is a {}]".format(len(self.random_name), self.turns, self.random_key))
+		print("\nThe word is of {} letters, number of guesses you have are: {}. [Hint: {}]".format(len(self.random_name), self.turns, self.random_key))
 		print(' '.join(self.name_while_guess))
 
 		while self.turns > 0:
@@ -61,7 +79,7 @@ class Hangman():
 			
 						if "_" not in self.name_while_guess:
 							print("\nCONGRATULATIONS, YOU WON! WOOHOO!")
-							return 'won'
+							return 'won', self.difficulty_level
 					else:
 						self.turns -= 1
 						print("Wrong choice!")
@@ -73,7 +91,7 @@ class Hangman():
 
 		print("You lost, better luck next time!")
 		print("The word was: ", self.random_name)
-		return 'lost'
+		return 'lost', self.difficulty_level
 
 	def __str__(self):
 		print("Hangman Game!")
@@ -81,7 +99,7 @@ class Hangman():
 
 if __name__ == '__main__':
 	user = Hangman()
-	user.display_to_user()
+	# user.display_to_user()
 
 
 # to add later - 
@@ -100,13 +118,15 @@ if __name__ == '__main__':
 # back option  -- done
 # take care of case sensitivity when user is making a choice  -- done
 # exit option only on start page very first page   -- done
+# multiplayer game or single player (multiplayer - other person gives the words and hint, keep track of both players scores -- done
 
-# multiplayer game or single player (multiplayer - other person gives the words, should be shown in stars), keep track of both players scores
+# in multiplayer the word given by player should be in stars
 # what to do if user guesses the whole name at once in hangman
 # difficulty level? - based on past of the user maybe -- later 
-# add more categories, (import from csv with multiple categories?)  -- later
+# add more categories, (import from csv with multiple categories?), add this feature to multiplayer as well  -- later
 # add another hint but it costs you one chance, hints can store in csv  -- later
 # the password is stored in stars in db and should contain letters and special characters
+# get mail id as i/p as well
 # update passwprd option if forgot, update modified on accordingly
 # can send otp through mail when forgot option
 # send mail when log in
