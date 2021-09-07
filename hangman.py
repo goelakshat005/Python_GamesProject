@@ -1,4 +1,5 @@
 import random
+import getpass
 
 class Hangman():
 	avail_letters = 'abcdefghijklmnopqrstuvwxyz'
@@ -13,7 +14,7 @@ class Hangman():
 
 		if self.gametype == "multi":
 			while True:
-				self.random_name = input("Please enter word for {} to guess (word should be greater than or equal to 3 letters): ".format(name))
+				self.random_name = getpass.getpass("Please enter word for {} to guess (word should be greater than or equal to 3 letters): ".format(name))  # mask the i/p
 				if self.random_name.isspace() == False and len(self.random_name) >= 3:
 					break
 				print("Please enter a valid word!")
@@ -133,17 +134,18 @@ if __name__ == '__main__':
 # take care of case sensitivity when user is making a choice  -- done
 # exit option only on start page very first page   -- done
 # multiplayer game or single player (multiplayer - other person gives the words and hint, keep track of both players scores -- done
+# get mail id as i/p as well -- done
+# can send otp through mail when forgot option -- done
+# update passwprd option if forgot, update modified on accordingly -- done
+# confirm password by making user enter twice while signing up/ passwprd change -- done
+# password should contain letters and special characters and digits -- done
 
 # in multiplayer the word given by player should be in stars
 # what to do if user guesses the whole name at once in hangman
 # difficulty level? - based on past of the user maybe -- later 
 # add more categories, (import from csv with multiple categories?), add this feature to multiplayer as well  -- later
 # add another hint but it costs you one chance, hints can store in csv  -- later
-# the password is stored in stars in db and should contain letters and special characters
-# get mail id as i/p as well
-# update passwprd option if forgot, update modified on accordingly
-# can send otp through mail when forgot option
-# send mail when log in
+# the password is stored in stars in db
 # change random function in hangman to make truly random
 # can create a constants file if useful
 # write test cases if possible

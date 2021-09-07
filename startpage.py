@@ -1,24 +1,41 @@
 import pandas as pd
-import datetime
+from datetime import datetime
 import uuid
 from db_engines import DBEngines
 from settings import DATABASES
 import time
 import stdiomask
+import re
+import random
+import smtplib, ssl
 
 from hangman import Hangman
 from game_results import Gameresult
 from multiplayer import Multiplayer
 from difficulty import Difficulty
 
+# creates SMTP session
+s = smtplib.SMTP('smtp.gmail.com', 587)
+# start TLS for security
+s.starttls()
+# Authentication
+s.login("akshattesting123@gmail.com", "testing@123")
+
+
 SQL_QUERY_CHECK_USERNAME_DETAILS = r"""
 	SELECT * FROM {user_details_table}
 	WHERE username = '{username}'
 """
 
+SQL_QUERY_UPDATE_USERPASSWORD_DETAILS = r"""
+	UPDATE {user_details_table}
+	SET password = '{password}', modified_on = '{now}'
+	WHERE username = '{username}'
+"""
+
 SQL_QUERY_APPEND_DETAILS = r"""
 	INSERT INTO {user_details_table}
-	VALUES ('{id_val}', '{username}', '{password}');
+	VALUES ('{id_val}', '{username}', '{password}', '{emailid}');
 """
 
 SQL_QUERY_CHECK_USER_DETAILS = r"""
@@ -88,19 +105,18 @@ class Player(Gameresult):
 		self.db_engines = DBEngines.get_instance()
 		self.games_db_engine = self.db_engines.get_engine(DATABASES['default'])
 
-	def get_signup_sql_query(self, username, password='',id_val=''):
+	def get_signup_sql_query(self, username, emailid='', password='',id_val=''):
 		if password == '':
 			sql = SQL_QUERY_CHECK_USERNAME_DETAILS.format(
 							user_details_table='user_details',
-							username=username,
-							password=password,
-							id_val=id_val)
+							username=username)
 			return sql
 
 		sql = SQL_QUERY_APPEND_DETAILS.format(
 					user_details_table='user_details',
 					username=username,
 					password=password,
+					emailid=emailid,
 					id_val=id_val)
 		return sql
 
@@ -111,11 +127,20 @@ class Player(Gameresult):
 						password=password)
 		return sql
 
+	def change_password_sql_query(self, username, password):
+		now = datetime.now()
+		sql = SQL_QUERY_UPDATE_USERPASSWORD_DETAILS.format(
+						user_details_table='user_details',
+						username=username,
+						password=password,
+						now=now)
+		return sql
+
 	def signup(self):
 		user_accepted = False
 		while not user_accepted:
 			username = input("Please enter username(greater than 5 characters): ")
-			if len(username) <= 5:
+			if len(username) < 5:
 				print("Username less than 5 characters, please choose some other username!\n")
 				continue
 
@@ -124,23 +149,38 @@ class Player(Gameresult):
 			existing username to user details table."""
 			df = pd.read_sql(sql=sql_query, con=self.games_db_engine)
 			
-			if df.empty and len(username) > 5:
+			if df.empty and len(username) >= 5:
 				user_accepted = True
 			else:
 				print("Username already exists, please choose some other username!\n")
 				
+		regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
 		pass_accepted = False
 		while not pass_accepted:
 			# password = input("Please enter password(greater than 5 characters): ")
-			print("Please enter password(should be greater than 5 characters)")
+			print("Please enter password(should be greater than 5 characters and should contain atleast one special character, one letter and one digit)")
 			password = stdiomask.getpass()
-			if len(password) > 5:
-				pass_accepted = True
+			if len(password) > 5 and regex.search(password) != None and bool(re.match('^(?=.*[0-9]$)(?=.*[a-zA-Z])', password)) == True:
+				print("Please enter password again to confirm")
+				password2 = stdiomask.getpass()
+				if password == password2:
+					pass_accepted = True
+				else:
+					print("Password mismatch!")
 			else:
-				print("Password less than 5 characters, enter again!\n")
+				print("Password is weak, enter again!\n")
+
+		regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+		email_accepted = False
+		while not email_accepted:
+			emailid = input("Please enter Email id: ")
+			if(re.fullmatch(regex, emailid)):
+				email_accepted = True
+			else:
+				print("Invalid email, enter again!\n")
 
 		id_val = uuid.uuid1()
-		sql_query = self.get_signup_sql_query(username, password, id_val)
+		sql_query = self.get_signup_sql_query(username, emailid, password, id_val)
 
 		try:
 			with self.games_db_engine.connect() as con:
@@ -171,6 +211,45 @@ class Player(Gameresult):
 		time.sleep(1)
 		return username
 
+	def forgotpassword(self):
+		user_accepted = False
+		while not user_accepted:
+			username = input("Please enter username: ")
+			sql_query = self.get_signup_sql_query(username)
+			df = pd.read_sql(sql=sql_query, con=self.games_db_engine)
+			if not df.empty:
+				user_accepted = True
+			else:
+				print("Username and password you provided are incorrect, please enter again!\n")
+		
+		emailid = df.iloc[0]['emailid']
+		number = random.randint(1111,9999)
+
+		msg = "Subject: OTP for password change.\n\nThe OTP for changing you password is: {}. Please take care of your privacy and never hare such mails or messages with anyone".format(str(number))
+		s.sendmail('akshattesting123@gmail.com', emailid, msg)
+
+		otp = input("An OTP has been sent to your email id -  {}, please enter here to reset your password: ".format('*'*(len(emailid)-7)+emailid[-13:]))
+		if int(otp) == number:
+			regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+			pass_accepted = False
+			while not pass_accepted:
+				# password = input("Please enter password(greater than 5 characters): ")			
+				print("Please enter password(should be greater than 5 characters and should contain atleast one special character, one letter and one digit)")
+				password = stdiomask.getpass()
+				if len(password) > 5 and regex.search(password) != None and bool(re.match('^(?=.*[0-9]$)(?=.*[a-zA-Z])', password)) == True:
+					print("Please enter password again to confirm")
+					password2 = stdiomask.getpass()
+					if password == password2:
+						pass_accepted = True
+					else:
+						print("Password mismatch!")
+				else:
+					print("Password is weak, enter again!\n")
+
+			sql_query = self.change_password_sql_query(username, password)
+			with self.games_db_engine.connect() as con:
+				con.execution_options(autocommit=True).execute(sql_query)
+			print("Password change successful!")
 
 	def startpage(self):
 		while True:  # because we need to show the user login page again and again until user exits using option number 4
@@ -178,25 +257,29 @@ class Player(Gameresult):
 			usertype = ''
 			username = ''
 			while not entered:
-				option = input("Please choose an option:\n1. Login (If existing user)\n2. Signup\n3. Play as a guest\n4. Exit\n")
-				options = {"1":"login", "2":"signup","3":"guest","4":"exit"}
+				option = input("Please choose an option:\n1. Login (If existing user)\n2. Signup\n3. Play as a guest\n4. Forgot password\n5. Exit\n")
+				options = {"1":"login", "2":"signup","3":"guest","4":"forgot password","5":"exit"}
 				if option in options:
-					entered = True
+					if option == '1':
+						entered = True
+						usertype = 'user'
+						username = self.login()
+					elif option == '2':
+						entered = True
+						usertype = 'user'
+						username = self.signup()
+					elif option == '3':
+						entered = True
+						usertype = 'guest'
+						print("Logging in as a guest...")
+						time.sleep(1)
+					elif option == '4':
+						self.forgotpassword()
+					else:
+						return
 				else:
 					print("Invalid option! Choose again.\n")
 
-			if option == '1':
-				usertype = 'user'
-				username = self.login()
-			elif option == '2':
-				usertype = 'user'
-				username = self.signup()
-			elif option == '3':
-				usertype = 'guest'
-				print("Logging in as a guest...")
-				time.sleep(1)
-			else:
-				return
 
 			self.game_options(usertype, username)
 

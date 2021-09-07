@@ -8,8 +8,9 @@ DROP TABLE IF EXISTS user_details;
 
 CREATE TABLE IF NOT EXISTS "user_details" (	
 	"id"              uuid NOT NULL PRIMARY KEY,
-	"username"        varchar(80) NOT NULL,                  -- could have had UNQIUE constraint and then can be used as foreign key
+	"username"        varchar(80) NOT NULL,
 	"password"		  varchar(80) NOT NULL,
+	"emailid"		  varchar(80) NOT NULL,
 	"created_on"      timestamp WITH time ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	"modified_on"     timestamp WITH time ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	CONSTRAINT "username_unique" UNIQUE ("username")

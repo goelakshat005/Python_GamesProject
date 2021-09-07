@@ -78,14 +78,13 @@ class Gameresult:
 		for i in range(len(df)):
 			print('{} -  Games Won: {}, Games Lost: {}'.format(df.iloc[i]['difficulty'], df.iloc[i]['games_won'], df.iloc[i]['games_lost']))
 
-	def display_game_results_options(self, games, username):
+	def display_game_results_options(self, avail_games, username):
 		while True:
-			games_dict = {str(i+1): games[i] for i in range(0, len(games))}
+			games_dict = {str(i+1): avail_games[i] for i in range(0, len(avail_games))}
 
 			entered = False
 			while not entered:
 				print("Choose game you want to see scores of:")
-				
 				for idx, game in games_dict.items():
 					print(idx, game.capitalize())
 				
@@ -93,7 +92,6 @@ class Gameresult:
 				print(int(idx)+2, 'Back')
 
 				option = input()
-				print(option)
 				if option in games_dict:
 					sql_query = SQL_QUERY_CHECK_USER_IN_GAME_DETAILS.format(
 								user_game_details_table='user_game_details',
@@ -123,7 +121,8 @@ class Gameresult:
 					print("{}-".format(game.capitalize()))
 					games.append(game)
 				print('{} -  Games Won: {}, Games Lost: {}'.format(df.iloc[i]['difficulty'].capitalize(), df.iloc[i]['games_won'], df.iloc[i]['games_lost']))
-			print("\n")
+			if df.empty:
+				print("Please play a game to have scores!")
 
 	def __str__(self):
 		print("Game Results!")
