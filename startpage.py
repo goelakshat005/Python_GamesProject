@@ -9,7 +9,7 @@ import re
 import random
 import smtplib, ssl
 
-from hangman import Hangman
+from hangman.hangman import Hangman
 from game_results import Gameresult
 from multiplayer import Multiplayer
 from difficulty import Difficulty
