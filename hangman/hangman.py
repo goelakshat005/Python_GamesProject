@@ -39,10 +39,12 @@ class Hangman(Difficulty, WordCategoryHint):
 		else:
 			self.difficulty_level = super().getdifficultylevel()
 
+
+		self.guessed_letters = ''
+		self.name_while_guess = []
+
 		if self.gametype == "multi":
 			self.name = name
-			self.guessed_letters = ''
-			self.name_while_guess = []
 			while True:
 				self.random_name = getpass.getpass("Please enter word for {} to guess (word should be greater than or equal to 3 letters): ".format(name))  # mask the i/p
 				if self.random_name.isspace() == False and len(self.random_name) >= 3:
