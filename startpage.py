@@ -101,56 +101,52 @@ class GamesScoresOptions(GameResults):
 					return
 
 	def play_option(self):
-		play_again = True
-		while play_again:
-			if self.gametype == "multi":
-				play = Hangman(self.usertype, self.gametype)
-				multi_instance = MultiPlayer()
-				while True:
-					players = ['player1', 'player2']
-					for player in players:
-						if player == "player1":
-							name = multi_instance.player1_name()
-							print("{} playing first.".format(name))
-							if self.game == "Hangman":
-								play.word_and_hint(name)
-						else:
-							name = multi_instance.player2_name()
-							print("{} playing now.".format(name))							
-							if self.game == "Hangman":
-								play.word_and_hint(name, difficulty_level)  # since we want player2 to have the same difficulty as player1
+		play = Hangman(self.usertype, self.gametype)
+		if self.gametype == "multi":
+			multi_instance = MultiPlayer()
+			while True:
+				players = ['player1', 'player2']
+				for player in players:
+					if player == "player1":
+						name = multi_instance.player1_name()
+						print("{} playing first.".format(name))
+						if self.game == "Hangman":
+							play.word_and_hint(name)
+					else:
+						name = multi_instance.player2_name()
+						print("{} playing now.".format(name))							
+						if self.game == "Hangman":
+							play.word_and_hint(name, difficulty_level)  # since we want player2 to have the same difficulty as player1
 
-						# elif self.game == "Rock, Paper, Scissors":
-						# 	play = Rockpaperscissor(self.usertype, self.gametype, name)
-						# elif self.game == "TicTacToe":
-						# 	play = Hangman(self.usertype, self.gametype, name)
-						
-						result, difficulty_level = play.user_game()
-						multi_instance.updatescores(player, result)
+					# elif self.game == "Rock, Paper, Scissors":
+					# 	play = Rockpaperscissor(self.usertype, self.gametype, name)
+					# elif self.game == "TicTacToe":
+					# 	play = Hangman(self.usertype, self.gametype, name)
 
-					multi_instance.displayscores()
-					if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
-						return
+					result, difficulty_level = play.user_game()
+					multi_instance.updatescores(player, result)
 
-			elif self.gametype == "single":
-				if self.game == "Hangman":
-					play = Hangman(self.usertype, self.gametype)
-					play.word_and_hint()
-				# elif self.game == "Rock, Paper, Scissors":
-				# 	play = Rockpaperscissor(self.usertype, self.gametype, name)
-				# elif self.game == "TicTacToe":
-				# 	play = Hangman(self.usertype, self.gametype, name)
-
-				result, difficulty_level = play.user_game()
-
-				if self.usertype != 'guest':
-					super().base_results(self.username, self.game, difficulty_level, result)
-					super().display_user_game_details(self.username, self.game)
-
+				multi_instance.displayscores()
 				if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
 					return
 
-		return
+			elif self.gametype == "single":
+				while True:
+					if self.game == "Hangman":
+						play.word_and_hint()
+					# elif self.game == "Rock, Paper, Scissors":
+					# 	play = Rockpaperscissor(self.usertype, self.gametype, name)
+					# elif self.game == "TicTacToe":
+					# 	play = Hangman(self.usertype, self.gametype, name)
+
+					result, difficulty_level = play.user_game()
+
+					if self.usertype != 'guest':
+						super().base_results(self.username, self.game, difficulty_level, result)
+						super().display_user_game_details(self.username, self.game)
+
+					if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
+						return
 
 class PlayerStart(MultiPlayer):
 				
