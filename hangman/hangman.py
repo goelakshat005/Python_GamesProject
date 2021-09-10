@@ -2,24 +2,47 @@ import random
 import getpass
 import pandas as pd
 import os
+from difficulty import Difficulty
 
-class Wordcategoryhint():
+class WordCategoryHint():
 	def __init__(self):
+		pass
+
+	def get_word_row(self):
 		df = pd.read_csv('hangman/hangman_words_hints.tsv', sep='\t')
 		name = random.choice(df['word'])
 		df_filtered = df.loc[df['word'] == name]
 		row_list = df_filtered.to_dict('records')
 		return row_list[0]
 
-class Hangman(Wordcategoryhint):
+class Hangman(Difficulty, WordCategoryHint):
 	avail_letters = 'abcdefghijklmnopqrstuvwxyz'
 	turns_diff = {'easy': 5, 'medium': 3, 'hard' : 2}
 
-	def __init__(self, usertype, gametype, difficulty_level, name=''):
+	def __init__(self, usertype, gametype):
+		self.usertype = usertype
 		self.gametype = gametype
+
+		self.guessed_letters = ''
+		self.name_while_guess = []
+		self.turns = 0
+		self.difficulty_level = ''
+
+		self.name = ''
+		self.row_dict = ''
+		self.random_key = ''
+		self.random_name = ''
+
+	def word_and_hint(self, name='', difficultyifplayer2=''):
+		if difficultyifplayer2 != '':
+			self.difficulty_level = difficultyifplayer2
+		else:
+			self.difficulty_level = super().getdifficultylevel()
 
 		if self.gametype == "multi":
 			self.name = name
+			self.guessed_letters = ''
+			self.name_while_guess = []
 			while True:
 				self.random_name = getpass.getpass("Please enter word for {} to guess (word should be greater than or equal to 3 letters): ".format(name))  # mask the i/p
 				if self.random_name.isspace() == False and len(self.random_name) >= 3:
@@ -32,27 +55,11 @@ class Hangman(Wordcategoryhint):
 					break
 				print("Please enter a valid hint!")
 
-		elif gametype == "single":
-			self.row_dict = super().__init__()
+		elif self.gametype == "single":
+			self.row_dict = super().get_word_row()
 			self.random_key = self.row_dict['category']
 			self.random_name = self.row_dict['word']
-			self.random_name = " ".join((self.random_name).split())
-
-		self.difficulty_level = difficulty_level		
-
-		self.guessed_letters = ''
-		self.name_while_guess = []
-		turns = 0
-		words = self.random_name.split(" ")
-		for word in words:
-			turns += len(word)
-			dashes = "_"*len(word)
-			dashes_list = list(dashes)
-			self.name_while_guess += dashes_list
-			self.name_while_guess.append(" ")
-		self.name_while_guess.pop()
-
-		self.turns = self.turns_diff[self.difficulty_level] + turns
+			self.random_name = " ".join((self.random_name).split())	
 
 	def return_if_guessing_possible(self, letter_guessed):
 		if letter_guessed in self.avail_letters and len(letter_guessed) == 1:
@@ -72,10 +79,23 @@ class Hangman(Wordcategoryhint):
 			return True
 		return False
 
-	def display_to_user(self):
+	def user_game(self):
+
+		turns = 0
+		words = self.random_name.split(" ")
+		for word in words:
+			turns += len(word)
+			dashes = "_"*len(word)
+			dashes_list = list(dashes)
+			self.name_while_guess += dashes_list
+			self.name_while_guess.append(" ")
+		self.name_while_guess.pop()
+		self.turns = self.turns_diff[self.difficulty_level] + turns
+
 		print("\nThe word is of {} letters, number of guesses you have are: {}. [Hint: {}]".
 			format(self.turns-self.turns_diff[self.difficulty_level], self.turns, self.random_key))
 		print(' '.join(self.name_while_guess))
+
 		hints_given = 1  # as one hint is already given when shown the blank name
 
 		while self.turns > 0:
@@ -172,11 +192,24 @@ if __name__ == '__main__':
 # in multiplayer the word given by player should NOT BE SHOWN WHILE typing  -- done
 # words, hints can store in tsv  -- done
 # add more categories, (import from csv with multiple categories?) -- done
-# add another hint but it costs you chances, add this feature to multiplayer as well  -- later
+# add another hint but it costs you chances, add this feature to multiplayer as well  -- done
 
-# difficulty level? - based on past of the user maybe -- later
+# difficulty level based on past of the user
 # the password is stored in stars in db
 # write test cases if possible
+# last hint could cost 2 chances actually in hangman , can only be taken when the number of turns left are atleast 3 (1 for guessing, two for taking away)
+# hangman can have difficulty based on words that is rarity of letters, length of word, this is optional
 
 # rock papers scissors
+#    --- in rock paper scissors don't require difficulty since it's anyway random
 # tic tac toe  # only 2 players
+# jumbled word
+# high low
+
+# go through code finally at very end
+# username could be a class variable, same for usertype, gametype. eg self.username=username because otherwise we have to pass everywhere
+# optionhangman class in startpage file could have everything in __init__ function itself
+# first ask single player or multi player  and then show games accordingly
+# common game option function in startpage for all games/ or have a base game option class
+# work on namings
+# create constants file if possible

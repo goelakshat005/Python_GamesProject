@@ -1,5 +1,6 @@
-class Multiplayer():
+class MultiPlayer():
 	gametypes = {"1": "single", "2": "multi"}
+
 	def __init__(self):
 		while True:
 			player1 = input("Please enter name for first player: ")
@@ -19,6 +20,13 @@ class Multiplayer():
 		self.player1score_lost = 0
 		self.player2score_won = 0
 		self.player2score_lost = 0
+
+	def player1_name(self):
+		return self.player1
+
+	def player2_name(self):
+		return self.player2
+		
 
 	def checkgametype(self):                           # check if 2 player game or single player 
 		print("Do you want to play:\n1. Single Player\n2. Multi Player\n3. Back")

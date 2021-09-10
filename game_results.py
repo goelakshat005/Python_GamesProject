@@ -2,12 +2,12 @@ import pandas as pd
 from db_engines import DBEngines
 from settings import DATABASES
 
-SQL_QUERY_CHECK_USER_ALL_GAME_DETAILS = r"""
+SQL_QUERY_USER_ALL_GAME_DETAILS = r"""
 	SELECT * FROM {user_game_details_table}
 	WHERE username = '{username}' 
 """
 
-SQL_QUERY_CHECK_USER_IN_GAME_DETAILS = r"""
+SQL_QUERY_USER_SPECIFIC_GAME_DETAILS = r"""
 	SELECT * FROM {user_game_details_table}
 	WHERE username = '{username}' 
 	AND game = '{game}'
@@ -27,30 +27,35 @@ SQL_QUERY_UPDATE_USER_GAME_DETAILS = r"""
 	AND difficulty = '{difficulty}'
 """
 
-class Gameresult:
+class GameResults:
+	
+	db_engines = DBEngines.get_instance()
+	games_db_engine = db_engines.get_engine(DATABASES['default'])
 	
 	def __init__(self):
-		self.db_engines = DBEngines.get_instance()
-		self.games_db_engine = self.db_engines.get_engine(DATABASES['default'])
+		pass
 
-	def update_results(self, username, game, difficulty, result):
-		exists = self.check_user_game_details(username, game)
-		if not exists:
+	def base_results(self, username, game, difficulty, result, create_with_difficulties=True):
+		sql_query = self.get_sql_user_specific_game_details(username, game)
+		df = pd.read_sql(sql=sql_query, con=self.games_db_engine)
+		if df.empty:
 			self.create_user_game_details(username, game)
 		self.update_user_game_details(username, game, difficulty, result)
 
-	def check_user_game_details(self,username, game):
-		sql_query = SQL_QUERY_CHECK_USER_IN_GAME_DETAILS.format(
+	def get_sql_user_specific_game_details(self, username, game):
+		sql_query = SQL_QUERY_USER_SPECIFIC_GAME_DETAILS.format(
 							user_game_details_table='user_game_details',
 							username=username,
 							game=game)
-		df = pd.read_sql(sql=sql_query, con=self.games_db_engine)
-		if df.empty:
-			return False
-		else:
-			return True
+		return sql_query
 
-	def create_user_game_details(self, username, game):
+	def get_sql_user_all_game_details(self, username):
+		sql_query = SQL_QUERY_USER_ALL_GAME_DETAILS.format(
+								user_game_details_table='user_game_details',
+								username=username)
+		return sql_query
+
+	def create_user_game_details(self, username, game, create_with_difficulties=True): #TODO: for rock paper scissors it will be false and use different sql query
 		sql_query = SQL_QUERY_APPEND_USER_GAME_DETAILS.format(
 							user_game_details_table='user_game_details',
 							username=username,
@@ -69,10 +74,7 @@ class Gameresult:
 			con.execution_options(autocommit=True).execute(sql_query)
 
 	def display_user_game_details(self, username, game):
-		sql_query = SQL_QUERY_CHECK_USER_IN_GAME_DETAILS.format(
-							user_game_details_table='user_game_details',
-							username=username,
-							game=game)
+		sql_query = self.get_sql_user_specific_game_details(username, game)
 		df = pd.read_sql(sql=sql_query, con=self.games_db_engine)
 		print("\nYour scores for the game {} up till now are: \n".format(game))
 		for i in range(len(df)):
@@ -93,16 +95,11 @@ class Gameresult:
 
 				option = input()
 				if option in games_dict:
-					sql_query = SQL_QUERY_CHECK_USER_IN_GAME_DETAILS.format(
-								user_game_details_table='user_game_details',
-								username=username,
-								game=games_dict[option])
+					sql_query = self.get_sql_user_specific_game_details(username, games_dict[option])
 					entered = True
 
 				elif option == str(int(idx)+1):
-					sql_query = SQL_QUERY_CHECK_USER_ALL_GAME_DETAILS.format(
-								user_game_details_table='user_game_details',
-								username=username)
+					sql_query = self.get_sql_user_all_game_details(username)
 					entered = True
 
 				elif option == str(int(idx)+2):
@@ -118,11 +115,11 @@ class Gameresult:
 			for i in range(len(df)):
 				game = df['game'][0]
 				if game not in games:
-					print("{}-".format(game.capitalize()))
+					print("{}-".format(game))
 					games.append(game)
 				print('{} -  Games Won: {}, Games Lost: {}'.format(df.iloc[i]['difficulty'].capitalize(), df.iloc[i]['games_won'], df.iloc[i]['games_lost']))
 			if df.empty:
-				print("Please play a game to have scores!")
+				print("Please play a game to have scores!\n")
 
 	def __str__(self):
 		print("Game Results!")
