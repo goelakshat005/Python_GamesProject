@@ -193,6 +193,11 @@ if __name__ == '__main__':
 # words, hints can store in tsv  -- done
 # add more categories, (import from csv with multiple categories?) -- done
 # add another hint but it costs you chances, add this feature to multiplayer as well  -- done
+# username could be a class variable, same for usertype, gametype. eg self.username=username because otherwise we have to pass everywhere -- done
+# optionhangman class in startpage file could have everything in __init__ function itself -- done
+# first ask single player or multi player  and then show games accordingly -- done
+# common game option function in startpage for all games/ or have a base game option class  -- done
+# work on namings -- done
 
 # difficulty level based on past of the user
 # the password is stored in stars in db
@@ -207,9 +212,4 @@ if __name__ == '__main__':
 # high low
 
 # go through code finally at very end
-# username could be a class variable, same for usertype, gametype. eg self.username=username because otherwise we have to pass everywhere
-# optionhangman class in startpage file could have everything in __init__ function itself
-# first ask single player or multi player  and then show games accordingly
-# common game option function in startpage for all games/ or have a base game option class
-# work on namings
 # create constants file if possible

@@ -61,7 +61,7 @@ class GamesScoresOptions(GameResults):
 			super().display_game_results_options(self.available_games, self.username)
 		else:
 			print("You are not a user, please select again or signup to keep a track of your records!\n")
-	
+			
 	def game_options(self):
 		while True:
 			if self.gametype == 'multi':
@@ -114,19 +114,18 @@ class GamesScoresOptions(GameResults):
 							print("{} playing first.".format(name))
 							if self.game == "Hangman":
 								play.word_and_hint(name)
-								result, difficulty_level = play.user_game()
 						else:
 							name = multi_instance.player2_name()
 							print("{} playing now.".format(name))							
 							if self.game == "Hangman":
-								play.word_and_hint(name, difficulty_level)
-								result, difficulty_level = play.user_game() # since we want player2 to have the same difficulty as player1
+								play.word_and_hint(name, difficulty_level)  # since we want player2 to have the same difficulty as player1
 
 						# elif self.game == "Rock, Paper, Scissors":
 						# 	play = Rockpaperscissor(self.usertype, self.gametype, name)
 						# elif self.game == "TicTacToe":
 						# 	play = Hangman(self.usertype, self.gametype, name)
-
+						
+						result, difficulty_level = play.user_game()
 						multi_instance.updatescores(player, result)
 
 					multi_instance.displayscores()
