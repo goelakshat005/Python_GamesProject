@@ -33,20 +33,16 @@ class Hangman(Difficulty, WordCategoryHint):
 		self.random_key = ''
 		self.random_name = ''
 
-	def word_and_hint(self, name='', difficultyifplayer2=''):
-		if difficultyifplayer2 != '':
-			self.difficulty_level = difficultyifplayer2
-		else:
-			self.difficulty_level = super().getdifficultylevel()
+	def update_multiplayer_name(self, name):
+		self.name = name
 
-
+	def reset_class_vars(self):
 		self.guessed_letters = ''
 		self.name_while_guess = []
 
 		if self.gametype == "multi":
-			self.name = name
 			while True:
-				self.random_name = getpass.getpass("Please enter word for {} to guess (word should be greater than or equal to 3 letters): ".format(name))  # mask the i/p
+				self.random_name = getpass.getpass("Please enter word for {} to guess (word should be greater than or equal to 3 letters): ".format(self.name))  # mask the i/p
 				if self.random_name.isspace() == False and len(self.random_name) >= 3:
 					break
 				print("Please enter a valid word!")
@@ -61,7 +57,13 @@ class Hangman(Difficulty, WordCategoryHint):
 			self.row_dict = super().get_word_row()
 			self.random_key = self.row_dict['category']
 			self.random_name = self.row_dict['word']
-			self.random_name = " ".join((self.random_name).split())	
+			self.random_name = " ".join((self.random_name).split())			
+
+	def update_difficulty(self, difficultyifplayer2=''):
+		if difficultyifplayer2 != '':
+			self.difficulty_level = difficultyifplayer2
+		else:
+			self.difficulty_level = super().getdifficultylevel()
 
 	def return_if_guessing_possible(self, letter_guessed):
 		if letter_guessed in self.avail_letters and len(letter_guessed) == 1:
@@ -82,7 +84,6 @@ class Hangman(Difficulty, WordCategoryHint):
 		return False
 
 	def user_game(self):
-
 		turns = 0
 		words = self.random_name.split(" ")
 		for word in words:
@@ -145,7 +146,9 @@ class Hangman(Difficulty, WordCategoryHint):
 							if "_" not in self.name_while_guess:
 								print("The word is: ", self.random_name)
 								print("\nCONGRATULATIONS, YOU WON! WOOHOO!")
-								return 'won', self.difficulty_level
+								if self.gametype == "single":
+									return 'won', self.difficulty_level
+								return 'won'
 						else:
 							self.turns -= 1
 							print("Wrong choice!")
@@ -157,7 +160,9 @@ class Hangman(Difficulty, WordCategoryHint):
 
 		print("You lost, better luck next time!")
 		print("The word was: ", self.random_name)
-		return 'lost', self.difficulty_level
+		if self.gametype == "single":
+			return 'lost', self.difficulty_level
+		return 'lost'
 
 	def __str__(self):
 		print("Hangman Game!")
@@ -200,6 +205,9 @@ if __name__ == '__main__':
 # first ask single player or multi player  and then show games accordingly -- done
 # common game option function in startpage for all games/ or have a base game option class  -- done
 # work on namings -- done
+# apostrophe error in username password due to sql error  -- done
+# rock papers scissors -- done
+#    --- in rock paper scissors don't require difficulty since it's anyway random  -- done
 
 # difficulty level based on past of the user
 # the password is stored in stars in db
@@ -207,11 +215,11 @@ if __name__ == '__main__':
 # last hint could cost 2 chances actually in hangman , can only be taken when the number of turns left are atleast 3 (1 for guessing, two for taking away)
 # hangman can have difficulty based on words that is rarity of letters, length of word, this is optional
 
-# rock papers scissors
-#    --- in rock paper scissors don't require difficulty since it's anyway random
 # tic tac toe  # only 2 players
 # jumbled word
 # high low
 
 # go through code finally at very end
+# do we create different play options for different games in startpage based on if difficulty or not
 # create constants file if possible
+# check signup, password - ayush1@ not accepted

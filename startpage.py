@@ -10,7 +10,8 @@ import random
 import smtplib, ssl
 
 from hangman.hangman import Hangman
-from rockpaperscissor import Rockpaperscissor
+from rockpaperscissor import RockPaperScissor
+from tictactoe import TicTacToe
 from game_results import GameResults
 from multiplayer import MultiPlayer
 
@@ -46,9 +47,12 @@ SQL_QUERY_ADD_USER = r"""
 
 
 class GamesScoresOptions(GameResults):
-	multiplayer_options  = {"1":"Hangman", "2":"Rock, Paper, Scissors", "3":"TicTacToe", "4":"Back"}
-	singleplayer_options = {"1":"Hangman", "2":"Rock, Paper, Scissors", "3":"Back"}
-	available_games = ["Hangman", "Rock, Paper, Scissors", "TicTacToe"]
+	single_player_games_for_scores = ["Hangman", "RockPaperScissor"]  # for results class
+	singleplayer_options = {"1":"Hangman", "2":"RockPaperScissor", "3":"Back"}   # for showing to user
+	multiplayer_options  = {"1":"Hangman", "2":"RockPaperScissor", "3":"TicTacToe", "4":"Back"}  # for showing to user
+	
+	game_multiplayer_type = {"type1": ["Hangman"], "type2":["RockPaperScissor", "TicTacToe"]}  # type 1 signifies when multiplayer plays turn by turn, type 2 signifies when both players play at the same moment
+	game_if_difficulty_in_scores_required = {"Hangman":True, "RockPaperScissor":False}  # includes only both single and multiplayer games
 
 	def __init__(self, usertype, username, gametype=''):
 		self.gametype = gametype
@@ -56,9 +60,15 @@ class GamesScoresOptions(GameResults):
 		self.username = username
 		self.game = ''
 
+		self.game_objects = {
+			"Hangman": Hangman, 
+			"RockPaperScissor": RockPaperScissor,
+			"TicTacToe": TicTacToe
+		}
+
 	def score_options(self):
 		if self.usertype != 'guest':
-			super().display_game_results_options(self.available_games, self.username)
+			super().display_game_results_options(self.single_player_games_for_scores, self.username)
 		else:
 			print("You are not a user, please select again or signup to keep a track of your records!\n")
 			
@@ -78,7 +88,10 @@ class GamesScoresOptions(GameResults):
 			
 				self.game = self.multiplayer_options[option]
 				if self.game != 'Back':
-					self.play_option()
+					if self.game in self.game_multiplayer_type["type1"]:
+						self.multiplayer_type1_play()
+					else:
+						self.multiplayer_type2_play()
 				else:
 					return
 
@@ -96,68 +109,88 @@ class GamesScoresOptions(GameResults):
 
 				self.game = self.singleplayer_options[option]
 				if self.game != 'Back':
-					self.play_option()
+					self.singleplayer_play()
 				elif self.game == 'Back':
 					return
 
-	def play_option(self):
-		play = Hangman(self.usertype, self.gametype)
-		if self.gametype == "multi":
-			multi_instance = MultiPlayer()
-			while True:
-				players = ['player1', 'player2']
-				for player in players:
-					if player == "player1":
-						name = multi_instance.player1_name()
-						print("{} playing first.".format(name))
-						if self.game == "Hangman":
-							play.word_and_hint(name)
-						# elif self.game == "Rock, Paper, Scissors":
-						# 	play = Rockpaperscissor(self.usertype, self.gametype, name)
-						# elif self.game == "TicTacToe":
-						# 	play = Hangman(self.usertype, self.gametype, name)
+	def singleplayer_play(self):
+		play = self.game_objects[self.game](self.usertype, self.gametype)
+		while True:
+			play.reset_class_vars()
+			play.update_difficulty()
+			result, difficulty_level = play.user_game()
 
+			if self.usertype != 'guest':
+				super().base_results(self.username, self.game, difficulty_level, result, self.game_if_difficulty_in_scores_required[self.game])
+				super().display_user_game_details(self.username, self.game)
 
-					else:
-						name = multi_instance.player2_name()
-						print("{} playing now.".format(name))							
-						if self.game == "Hangman":
-							play.word_and_hint(name, difficulty_level)  # since we want player2 to have the same difficulty as player1
-						# elif self.game == "Rock, Paper, Scissors":
-						# 	play = Rockpaperscissor(self.usertype, self.gametype, name)
-						# elif self.game == "TicTacToe":
-						# 	play = Hangman(self.usertype, self.gametype, name)
+			if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
+				return
 
-					result, difficulty_level = play.user_game()
-					multi_instance.updatescores(player, result)
+	def multiplayer_type1_play(self):
+		play = self.game_objects[self.game](self.usertype, self.gametype)
+		multi_instance = MultiPlayer()
+		while True:
+			players = ['player1', 'player2']
+			difficulty_level = ''
+			for player in players:
+				if player == "player1":
+					name = multi_instance.player1_name()
+					print("{} playing first.".format(name))
+					play.update_multiplayer_name(name)
+					play.reset_class_vars()
+					play.update_difficulty()
 
-				multi_instance.displayscores()
-				if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
-					return
+				else:
+					name = multi_instance.player2_name()
+					print("{} playing now.".format(name))								
+					play.update_multiplayer_name(name)
+					play.reset_class_vars()
+					play.update_difficulty(difficulty_level)  # since we want player2 to have the same difficulty as player1
 
-		elif self.gametype == "single":
-			while True:
-				if self.game == "Hangman":
-					play.word_and_hint()
-				# elif self.game == "Rock, Paper, Scissors":
-				# 	play = Rockpaperscissor(self.usertype, self.gametype, name)
-				# elif self.game == "TicTacToe":
-				# 	play = Hangman(self.usertype, self.gametype, name)
+				result = play.user_game()
+				multi_instance.updatescores_type1(player, result)
 
-				result, difficulty_level = play.user_game()
+			multi_instance.displayscores()
+			if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
+				return
 
-				if self.usertype != 'guest':
-					super().base_results(self.username, self.game, difficulty_level, result)
-					super().display_user_game_details(self.username, self.game)
+	def multiplayer_type2_play(self):
+		play = self.game_objects[self.game](self.usertype, self.gametype)
+		multi_instance = MultiPlayer()
+		name1 = multi_instance.player1_name()
+		name2 = multi_instance.player2_name()
+		
+		while True:
+			play.update_multiplayer_names(name1, name2)
+			play.reset_class_vars()
+			player_won = play.user_game()
+			multi_instance.updatescores_type2(player_won)
+			multi_instance.displayscores()
 
-				if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
-					return
+			if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
+				return
+
 
 class PlayerStart(MultiPlayer):
 				
 	def __init__(self):
 		self.db_engines = DBEngines.get_instance()
 		self.games_db_engine = self.db_engines.get_engine(DATABASES['default'])
+
+	def apostrophe_balancing(self, word):
+		if '\'' in word:
+			lis_word = list(word)
+			apostrophe_idx = []
+			for idx, let in enumerate(lis_word):
+				if let == '\'':
+					apostrophe_idx.append(idx)
+			count = 0
+			for idx in apostrophe_idx:
+				lis_word.insert(idx+count,"'")
+				count += 1
+			word = ''.join(lis_word)
+		return word
 
 	def get_sql_add_user(self, username, emailid, password,id_val):
 		sql = SQL_QUERY_ADD_USER.format(
@@ -199,6 +232,8 @@ class PlayerStart(MultiPlayer):
 				print("Username less than 5 characters, please choose some other username!\n")
 				continue
 
+			username = self.apostrophe_balancing(username)
+
 			sql_query = self.get_sql_username_check(username)  # could have used try except since username is anyway unique in db so would give error
 			df = pd.read_sql(sql=sql_query, con=self.games_db_engine)
 			
@@ -221,6 +256,8 @@ class PlayerStart(MultiPlayer):
 					print("Password mismatch!")
 			else:
 				print("Password is weak, enter again!\n")
+
+		password = self.apostrophe_balancing(password)
 
 		regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 		email_accepted = False
@@ -247,6 +284,9 @@ class PlayerStart(MultiPlayer):
 		while not user_accepted:
 			username = input("Please enter username: ")
 			password = stdiomask.getpass()
+			
+			username = self.apostrophe_balancing(username)
+			password = self.apostrophe_balancing(password)
 
 			sql_query = self.get_sql_user_check(username, password)
 			df = pd.read_sql(sql=sql_query, con=self.games_db_engine)
@@ -264,6 +304,7 @@ class PlayerStart(MultiPlayer):
 		user_accepted = False
 		while not user_accepted:
 			username = input("Please enter username: ")
+			username = self.apostrophe_balancing(username)
 			sql_query = self.get_sql_username_check(username)
 			df = pd.read_sql(sql=sql_query, con=self.games_db_engine)
 			if not df.empty:
@@ -295,6 +336,7 @@ class PlayerStart(MultiPlayer):
 				else:
 					print("Password is weak, enter again!\n")
 
+			password = self.apostrophe_balancing(password)
 			sql_query = self.get_sql_password_change(username, password)
 			with self.games_db_engine.connect() as con:
 				con.execution_options(autocommit=True).execute(sql_query)

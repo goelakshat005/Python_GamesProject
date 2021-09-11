@@ -13,11 +13,16 @@ SQL_QUERY_USER_SPECIFIC_GAME_DETAILS = r"""
 	AND game = '{game}'
 """
 
-SQL_QUERY_APPEND_USER_GAME_DETAILS = r"""
+SQL_QUERY_APPEND_USER_GAME_DETAILS_WITHDIFFICULTY = r"""
 	INSERT INTO {user_game_details_table} (username, game, difficulty)
 	VALUES ('{username}', '{game}', 'easy'), 
 	('{username}', '{game}', 'medium'), 
 	('{username}', '{game}', 'hard')
+"""
+
+SQL_QUERY_APPEND_USER_GAME_DETAILS_WITHOUTDIFFICULTY = r"""
+	INSERT INTO {user_game_details_table} (username, game, difficulty)
+	VALUES ('{username}', '{game}', '')
 """
 
 SQL_QUERY_UPDATE_USER_GAME_DETAILS = r"""
@@ -35,12 +40,12 @@ class GameResults:
 	def __init__(self):
 		pass
 
-	def base_results(self, username, game, difficulty, result, create_with_difficulties=True):
+	def base_results(self, username, game, difficulty, result, with_difficulties):
 		sql_query = self.get_sql_user_specific_game_details(username, game)
 		df = pd.read_sql(sql=sql_query, con=self.games_db_engine)
 		if df.empty:
-			self.create_user_game_details(username, game)
-		self.update_user_game_details(username, game, difficulty, result)
+			self.create_user_game_details(username, game, with_difficulties)
+		self.update_user_game_details(username, game, difficulty, result, with_difficulties)
 
 	def get_sql_user_specific_game_details(self, username, game):
 		sql_query = SQL_QUERY_USER_SPECIFIC_GAME_DETAILS.format(
@@ -51,19 +56,26 @@ class GameResults:
 
 	def get_sql_user_all_game_details(self, username):
 		sql_query = SQL_QUERY_USER_ALL_GAME_DETAILS.format(
-								user_game_details_table='user_game_details',
-								username=username)
+							user_game_details_table='user_game_details',
+							username=username)
 		return sql_query
 
-	def create_user_game_details(self, username, game, create_with_difficulties=True): #TODO: for rock paper scissors it will be false and use different sql query
-		sql_query = SQL_QUERY_APPEND_USER_GAME_DETAILS.format(
+	def create_user_game_details(self, username, game, with_difficulties):
+		if with_difficulties == True:
+			sql_query = SQL_QUERY_APPEND_USER_GAME_DETAILS_WITHDIFFICULTY.format(
 							user_game_details_table='user_game_details',
 							username=username,
 							game=game)
+		else:
+			sql_query = SQL_QUERY_APPEND_USER_GAME_DETAILS_WITHOUTDIFFICULTY.format(
+							user_game_details_table='user_game_details',
+							username=username,
+							game=game)
+
 		with self.games_db_engine.connect() as con:
 			con.execution_options(autocommit=True).execute(sql_query)
 
-	def update_user_game_details(self, username, game, difficulty, result):
+	def update_user_game_details(self, username, game, difficulty, result, with_difficulties):
 		sql_query = SQL_QUERY_UPDATE_USER_GAME_DETAILS.format(
 							user_game_details_table='user_game_details',
 							username=username,
@@ -86,7 +98,7 @@ class GameResults:
 
 			entered = False
 			while not entered:
-				print("Choose game you want to see scores of:")
+				print("\nChoose game you want to see scores of:")
 				for idx, game in games_dict.items():
 					print(idx, game.capitalize())
 				
@@ -113,13 +125,17 @@ class GameResults:
 			print("\nYour scores are:")
 			games = []
 			for i in range(len(df)):
-				game = df['game'][0]
+				game = df['game'][i]
 				if game not in games:
-					print("{}-".format(game))
+					print("\n{}-".format(game))
 					games.append(game)
-				print('{} -  Games Won: {}, Games Lost: {}'.format(df.iloc[i]['difficulty'].capitalize(), df.iloc[i]['games_won'], df.iloc[i]['games_lost']))
+				if df['difficulty'][i] == '':
+					print('Games Won: {}, Games Lost: {}'.format(df.iloc[i]['games_won'], df.iloc[i]['games_lost']))
+				else:
+					print('{} -  Games Won: {}, Games Lost: {}'.format(df.iloc[i]['difficulty'].capitalize(), df.iloc[i]['games_won'], df.iloc[i]['games_lost']))
+
 			if df.empty:
-				print("Please play a game to have scores!\n")
+				print("Please play a game to have it's scores!")
 
 	def __str__(self):
 		print("Game Results!")

@@ -38,7 +38,7 @@ class MultiPlayer():
 				return
 			print("Please enter a valid option!\n")
 
-	def updatescores(self, player, result):
+	def updatescores_type1(self, player, result):
 		if player == "player1":
 			if result == "won":
 				self.player1score_won += 1
@@ -49,6 +49,14 @@ class MultiPlayer():
 				self.player2score_won += 1
 			else:
 				self.player2score_lost += 1
+
+	def updatescores_type2(self, player):
+		if player == "player1":
+			self.player1score_won += 1
+			self.player2score_lost += 1
+		else:			
+			self.player2score_won += 1
+			self.player1score_lost += 1
 
 	def displayscores(self):
 		print("The scores are:\n1. {}'s score: Won - {}, Lost - {}\n2. {}'s score: Won - {}, Lost - {}".
