@@ -63,6 +63,7 @@ class Hangman(Difficulty, WordCategoryHint):
 		if difficultyifplayer2 != '':
 			self.difficulty_level = difficultyifplayer2
 		else:
+			print("You get +5 chances in easy mode, +3 chances in medium mode, and +2 chances in hard mode so choose wisely! All the best!\n")
 			self.difficulty_level = super().getdifficultylevel()
 
 	def return_if_guessing_possible(self, letter_guessed):
@@ -208,18 +209,20 @@ if __name__ == '__main__':
 # apostrophe error in username password due to sql error  -- done
 # rock papers scissors -- done
 #    --- in rock paper scissors don't require difficulty since it's anyway random  -- done
+# tic tac toe  # only 2 players -- done
+# do we create different play options for different games in startpage based on if difficulty or not  -- done
+
 
 # difficulty level based on past of the user
-# the password is stored in stars in db
+# the password is stored in stars in db/ encrypted
 # write test cases if possible
 # last hint could cost 2 chances actually in hangman , can only be taken when the number of turns left are atleast 3 (1 for guessing, two for taking away)
 # hangman can have difficulty based on words that is rarity of letters, length of word, this is optional
 
-# tic tac toe  # only 2 players
-# jumbled word
+# jumbled word -- difficulty will result in length of word and number of chances
 # high low
 
 # go through code finally at very end
-# do we create different play options for different games in startpage based on if difficulty or not
 # create constants file if possible
 # check signup, password - ayush1@ not accepted
+# update emailid option
