@@ -12,6 +12,8 @@ import smtplib, ssl
 from hangman.hangman import Hangman
 from rockpaperscissor import RockPaperScissor
 from tictactoe import TicTacToe
+from flames import Flames
+
 from game_results import GameResults
 from multiplayer import MultiPlayer
 
@@ -22,6 +24,7 @@ s.starttls()
 # Authentication
 s.login("akshattesting123@gmail.com", "testing@123")
 
+# although usertype is passed on to all the classes of games, we don't actually require it
 
 SQL_QUERY_CHECK_USER_EXISTS = r"""
 	SELECT * FROM {user_details_table}
@@ -49,9 +52,9 @@ SQL_QUERY_ADD_USER = r"""
 class GamesScoresOptions(GameResults):
 	single_player_games_for_scores = ["Hangman", "RockPaperScissor"]  # for results class
 	singleplayer_options = {"1":"Hangman", "2":"RockPaperScissor", "3":"Back"}   # for showing to user
-	multiplayer_options  = {"1":"Hangman", "2":"RockPaperScissor", "3":"TicTacToe", "4":"Back"}  # for showing to user
+	multiplayer_options  = {"1":"Hangman", "2":"RockPaperScissor", "3":"TicTacToe", "4":"Flames", "5":"Back"}  # for showing to user
 	
-	game_multiplayer_type = {"type1": ["Hangman"], "type2":["RockPaperScissor", "TicTacToe"]}  # type 1 signifies when multiplayer plays turn by turn, type 2 signifies when both players play at the same moment
+	game_multiplayer_type = {"type1": ["Hangman"], "type2":["RockPaperScissor"], "type3":["TicTacToe"]}  # type 1 signifies when multiplayer plays turn by turn, type 2 signifies when both players play at the same moment and type3 includes when no updation of scores is required each game is just standalone
 	game_if_difficulty_in_scores_required = {"Hangman":True, "RockPaperScissor":False}  # includes only both single and multiplayer games
 
 	def __init__(self, usertype, username, gametype=''):
@@ -63,7 +66,8 @@ class GamesScoresOptions(GameResults):
 		self.game_objects = {
 			"Hangman": Hangman, 
 			"RockPaperScissor": RockPaperScissor,
-			"TicTacToe": TicTacToe
+			"TicTacToe": TicTacToe,
+			"Flames": Flames
 		}
 
 	def score_options(self):
@@ -90,8 +94,10 @@ class GamesScoresOptions(GameResults):
 				if self.game != 'Back':
 					if self.game in self.game_multiplayer_type["type1"]:
 						self.multiplayer_type1_play()
-					else:
+					elif self.game in self.game_multiplayer_type["type2"]:
 						self.multiplayer_type2_play()
+					else:
+						self.multiplayer_type3_play()
 				else:
 					return
 
@@ -160,9 +166,9 @@ class GamesScoresOptions(GameResults):
 		multi_instance = MultiPlayer()
 		name1 = multi_instance.player1_name()
 		name2 = multi_instance.player2_name()
+		play.update_multiplayer_names(name1, name2)
 		
 		while True:
-			play.update_multiplayer_names(name1, name2)
 			play.reset_class_vars()
 			player_won = play.user_game()
 			multi_instance.updatescores_type2(player_won)
@@ -171,6 +177,17 @@ class GamesScoresOptions(GameResults):
 			if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
 				return
 
+	def multiplayer_type3_play(self):   # this also includes names being updated with every new game
+		play = self.game_objects[self.game](self.usertype, self.gametype)
+		while True:
+			multi_instance = MultiPlayer()
+			name1 = multi_instance.player1_name()
+			name2 = multi_instance.player2_name()
+			play.update_multiplayer_names(name1, name2)
+			play.reset_class_vars()
+			play.user_game()
+			if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
+				return
 
 class PlayerStart(MultiPlayer):
 				

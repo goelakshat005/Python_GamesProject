@@ -211,6 +211,7 @@ if __name__ == '__main__':
 #    --- in rock paper scissors don't require difficulty since it's anyway random  -- done
 # tic tac toe  # only 2 players -- done
 # do we create different play options for different games in startpage based on if difficulty or not  -- done
+# flames -- done
 
 
 # difficulty level based on past of the user
@@ -219,10 +220,17 @@ if __name__ == '__main__':
 # last hint could cost 2 chances actually in hangman , can only be taken when the number of turns left are atleast 3 (1 for guessing, two for taking away)
 # hangman can have difficulty based on words that is rarity of letters, length of word, this is optional
 
-# jumbled word -- difficulty will result in length of word and number of chances
+# jumbled word -- difficulty will result in change in length of word and number of chances, both single player and multiplayer
+# number guessing game, both single player and multiplayer
+# 21 card game, both single and multi player
 # high low
+# coin flip
+# quote guessing game, requires web scraping, both single and multi
 
 # go through code finally at very end
 # create constants file if possible
 # check signup, password - ayush1@ not accepted
 # update emailid option
+
+# can have special option under multiplayer list and keep all money related games there and then calculate at the end for both players across all games
+#           -- keep a track of how much both players owe each other, bets will be asked for
