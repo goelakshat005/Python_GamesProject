@@ -1,26 +1,23 @@
 import random
 import getpass
+import sys
+sys.path.append("..") # Adds higher directory to python modules path.
+
+from multiplayer import MultiPlayer
+from gameresults import GameResults
 
 class RockPaperScissor():
 	choices_win_dict = {('paper','rock'):'paper', ('paper','scissor'):'scissor', ('rock','scissor'):'rock'}  # combinations and winner of that combo
 	choices = {"1":"rock", "2":"paper", "3":"scissor"}
 
-	def __init__(self, usertype, gametype):
-		self.usertype = usertype
+	def __init__(self, gametype):
 		self.gametype = gametype
 		self.name1 = ''
 		self.name2 = ''
-		# sort input to be able to compare
 
 	def update_multiplayer_names(self, name1, name2):
 		self.name1 = name1
 		self.name2 = name2
-
-	def reset_class_vars(self):
-		pass
-
-	def update_difficulty(self):
-		pass
 
 	def user_game(self):
 		while True:
@@ -44,18 +41,17 @@ class RockPaperScissor():
 			if result == "tie":
 				print("Let's have the tie breaker!")
 				result = self.singleplayer_game(1)
-			return result, ''
+			return result
 
 		elif self.gametype == "multi":
 			result = self.multiplayer_game(turns)
 			if result == 0:
 				print("Let's have the tie breaker!")
 				result = self.multiplayer_game(1)
-			if reult == "player1":
+			if result == "player1":
 				print("{} won! Woohoo!!".format(self.name1))
 			else:
 				print("{} won! Woohoo!!".format(self.name2))
-			
 			return result
 
 	def singleplayer_game(self, turns):
@@ -142,3 +138,39 @@ class RockPaperScissor():
 			return (user_choice, comp_choice)
 		else:
 			return (comp_choice, user_choice)
+
+class BaseRockPaperScissor(GameResults):
+	def __init__(self, usertype, gametype, username=''):
+		self.usertype = usertype
+		self.gametype = gametype
+		self.username = username
+
+	def handle(self):
+		if self.gametype == "single":
+			while True:
+				play = RockPaperScissor(self.gametype)
+				result = play.user_game()
+
+				if self.usertype != 'guest':
+					super().base_results(self.username, "RockPaperScissor", '', result, False)  # blank signifies the difficulty level and False signifies 
+					# if we need to save a game with difficulty levels
+					super().display_user_game_details(self.username, "RockPaperScissor")
+
+				if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
+					return
+
+		elif self.gametype == "multi":
+			multi_instance = MultiPlayer()
+			name1 = multi_instance.player1_name()
+			name2 = multi_instance.player2_name()
+			play = RockPaperScissor(self.gametype)
+			play.update_multiplayer_names(name1, name2)
+			
+			while True:			
+				player_won = play.user_game()
+				multi_instance.updatescores_type2(player_won)
+				multi_instance.displayscores()
+
+				if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
+					return
+

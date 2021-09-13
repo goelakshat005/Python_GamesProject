@@ -1,23 +1,24 @@
 import random
+import sys
+sys.path.append("..") # Adds higher directory to python modules path.
+
+from multiplayer import MultiPlayer
+from gameresults import GameResults
 
 class TicTacToe():
 
 	possible_choices = [(0,0),(0,1),(0,2),(1,0),(1,1),(1,2),(2,0),(2,1),(2,2)]
 	marks = ['O','X']
 	
-	def __init__(self, usertype, gametype):
-		self.board = []
+	def __init__(self):
+		self.board = [[' ',   ' ',   ' '],
+					  [' ',   ' ',   ' '],
+					  [' ',   ' ',   ' ']]
 		self.choices_made = []
 
 	def update_multiplayer_names(self, name1, name2):
 		self.name1 = name1
 		self.name2 = name2
-
-	def reset_class_vars(self):
-		self.board = [[' ',   ' ',   ' '],
-					  [' ',   ' ',   ' '],
-					  [' ',   ' ',   ' ']]
-		self.choices_made = []
 
 	def update_difficulty(self):
 		pass
@@ -87,7 +88,7 @@ class TicTacToe():
 	def if_game_won(self):
 		# below covers all horizontal cases
 		for i in [0,1,2]:
-			if len(set(self.board[i])) == 1 and (set(self.board[i]) == 'X' or set(self.board[i]) == 'O'):
+			if len(set(self.board[i])) == 1 and (set(self.board[i]) == {'X'} or set(self.board[i]) == {'O'}):
 				return self.board[i][0]
 
 		# below covers all vertical cases
@@ -109,7 +110,11 @@ class TicTacToe():
 
 	def print_board(self): # to print neatly
 		blank = [' ']
+		print('     0      1      2\n')
+		count = 0
 		for lis in self.board:
+			print(count, end = '   ')
+			count += 1
 			for i in range(0,len(lis)):
 				if lis[i] == ' ':	
 					let = str(blank)
@@ -118,3 +123,29 @@ class TicTacToe():
 					let = str([lis[i]])
 					print(let[1:len(let)-1], end = '    ')
 			print("\n")
+
+class BaseTicTacToe(GameResults):
+	def __init__(self, usertype, gametype, username=''):
+		self.usertype = usertype
+		self.gametype = gametype
+		self.username = username
+
+	def handle(self):
+		if self.gametype == "single":
+			raise Exception("TicTacToe is not a singleplayer game!")
+
+		elif self.gametype == "multi":
+			multi_instance = MultiPlayer()
+			name1 = multi_instance.player1_name()
+			name2 = multi_instance.player2_name()
+
+			while True:
+				play = TicTacToe()
+				play.update_multiplayer_names(name1, name2)
+				player_won = play.user_game()
+				multi_instance.updatescores_type2(player_won)
+				multi_instance.displayscores()
+
+				if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
+					return
+

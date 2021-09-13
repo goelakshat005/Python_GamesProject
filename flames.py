@@ -1,19 +1,21 @@
 import time
+import sys
+sys.path.append("..") # Adds higher directory to python modules path.
+
+from multiplayer import MultiPlayer
+from gameresults import GameResults
 
 class Flames():
 	flames_word = "FLAMES"
 	flames_word_length = len(flames_word)
 	flames_meaning_dict = {"F":"Friends", "L":"Lovers", "A":"Affection", "M":"Marriage", "E":"Enemies", "S":"Siblings"}
 	
-	def __init__(self, usertype, gametype):
+	def __init__(self):
 		pass
 
 	def update_multiplayer_names(self, name1, name2):
 		self.name1 = name1
 		self.name2 = name2
-
-	def reset_class_vars(self):
-		pass
 
 	def update_difficulty(self):
 		pass
@@ -40,3 +42,24 @@ class Flames():
 		time.sleep(1)
 		print("The relationship status for you guys is: {}".format(self.flames_meaning_dict[self.flames_word[length_left-1]]))
 
+class BaseFlames(GameResults):
+
+	def __init__(self, usertype, gametype, username=''):
+		self.usertype = usertype
+		self.gametype = gametype
+		self.username = username
+
+	def handle(self):
+		if self.gametype == "single":
+			raise Exception("Flames is not a singleplayer game!")
+
+		elif self.gametype == "multi":
+			while True:
+				multi_instance = MultiPlayer()
+				name1 = multi_instance.player1_name()
+				name2 = multi_instance.player2_name()
+				play = Flames()
+				play.update_multiplayer_names(name1, name2)
+				play.user_game()
+				if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
+					return

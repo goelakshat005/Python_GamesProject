@@ -9,14 +9,14 @@ import re
 import random
 import smtplib, ssl
 
-from hangman.hangman import Hangman
-from rockpaperscissor import RockPaperScissor
-from tictactoe import TicTacToe
-from flames import Flames
+from hangman.hangman import BaseHangman
+from rockpaperscissor import BaseRockPaperScissor
+from tictactoe import BaseTicTacToe
+from flames import BaseFlames
+from jumbledwords import BaseJumbledWords 
 
-from game_results import GameResults
+from gameresults import GameResults
 from multiplayer import MultiPlayer
-
 # creates SMTP session
 s = smtplib.SMTP('smtp.gmail.com', 587)
 # start TLS for security
@@ -50,12 +50,16 @@ SQL_QUERY_ADD_USER = r"""
 
 
 class GamesScoresOptions(GameResults):
-	single_player_games_for_scores = ["Hangman", "RockPaperScissor"]  # for results class
+	game_objects = {
+		"Hangman": BaseHangman,
+		"RockPaperScissor": BaseRockPaperScissor,
+		"TicTacToe": BaseTicTacToe,
+		"Flames": BaseFlames,
+		"JumbledWords": BaseJumbledWords
+	}
+
 	singleplayer_options = {"1":"Hangman", "2":"RockPaperScissor", "3":"Back"}   # for showing to user
 	multiplayer_options  = {"1":"Hangman", "2":"RockPaperScissor", "3":"TicTacToe", "4":"Flames", "5":"Back"}  # for showing to user
-	
-	game_multiplayer_type = {"type1": ["Hangman"], "type2":["RockPaperScissor"], "type3":["TicTacToe"]}  # type 1 signifies when multiplayer plays turn by turn, type 2 signifies when both players play at the same moment and type3 includes when no updation of scores is required each game is just standalone
-	game_if_difficulty_in_scores_required = {"Hangman":True, "RockPaperScissor":False}  # includes only both single and multiplayer games
 
 	def __init__(self, usertype, username, gametype=''):
 		self.gametype = gametype
@@ -63,16 +67,12 @@ class GamesScoresOptions(GameResults):
 		self.username = username
 		self.game = ''
 
-		self.game_objects = {
-			"Hangman": Hangman, 
-			"RockPaperScissor": RockPaperScissor,
-			"TicTacToe": TicTacToe,
-			"Flames": Flames
-		}
 
 	def score_options(self):
 		if self.usertype != 'guest':
-			super().display_game_results_options(self.single_player_games_for_scores, self.username)
+			single_players_games_list = list(self.singleplayer_options.values())
+			single_players_games_list.pop()
+			super().display_game_results_options(single_players_games_list, self.username)
 		else:
 			print("You are not a user, please select again or signup to keep a track of your records!\n")
 			
@@ -92,12 +92,8 @@ class GamesScoresOptions(GameResults):
 			
 				self.game = self.multiplayer_options[option]
 				if self.game != 'Back':
-					if self.game in self.game_multiplayer_type["type1"]:
-						self.multiplayer_type1_play()
-					elif self.game in self.game_multiplayer_type["type2"]:
-						self.multiplayer_type2_play()
-					else:
-						self.multiplayer_type3_play()
+					play = self.game_objects[self.game](self.usertype, self.gametype)
+					play.handle()
 				else:
 					return
 
@@ -115,79 +111,24 @@ class GamesScoresOptions(GameResults):
 
 				self.game = self.singleplayer_options[option]
 				if self.game != 'Back':
-					self.singleplayer_play()
+					play = self.game_objects[self.game](self.usertype, self.gametype, self.username)
+					play.handle()
 				elif self.game == 'Back':
 					return
 
-	def singleplayer_play(self):
-		play = self.game_objects[self.game](self.usertype, self.gametype)
-		while True:
-			play.reset_class_vars()
-			play.update_difficulty()
-			result, difficulty_level = play.user_game()
-
-			if self.usertype != 'guest':
-				super().base_results(self.username, self.game, difficulty_level, result, self.game_if_difficulty_in_scores_required[self.game])
-				super().display_user_game_details(self.username, self.game)
-
-			if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
-				return
-
-	def multiplayer_type1_play(self):
-		play = self.game_objects[self.game](self.usertype, self.gametype)
-		multi_instance = MultiPlayer()
-		while True:
-			players = ['player1', 'player2']
-			difficulty_level = ''
-			for player in players:
-				if player == "player1":
-					name = multi_instance.player1_name()
-					print("{} playing first.".format(name))
-					play.update_multiplayer_name(name)
-					play.reset_class_vars()
-					play.update_difficulty()
-
-				else:
-					name = multi_instance.player2_name()
-					print("{} playing now.".format(name))								
-					play.update_multiplayer_name(name)
-					play.reset_class_vars()
-					play.update_difficulty(difficulty_level)  # since we want player2 to have the same difficulty as player1
-
-				result = play.user_game()
-				multi_instance.updatescores_type1(player, result)
-
-			multi_instance.displayscores()
-			if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
-				return
-
-	def multiplayer_type2_play(self):
-		play = self.game_objects[self.game](self.usertype, self.gametype)
-		multi_instance = MultiPlayer()
-		name1 = multi_instance.player1_name()
-		name2 = multi_instance.player2_name()
-		play.update_multiplayer_names(name1, name2)
-		
-		while True:
-			play.reset_class_vars()
-			player_won = play.user_game()
-			multi_instance.updatescores_type2(player_won)
-			multi_instance.displayscores()
-
-			if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
-				return
-
-	def multiplayer_type3_play(self):   # this also includes names being updated with every new game
-		play = self.game_objects[self.game](self.usertype, self.gametype)
-		while True:
-			multi_instance = MultiPlayer()
-			name1 = multi_instance.player1_name()
-			name2 = multi_instance.player2_name()
-			play.update_multiplayer_names(name1, name2)
-			play.reset_class_vars()
-			play.user_game()
-			if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
-				return
+	# def multiplayer_type4_play(self):
+	# 	print("Which type of game do you wanna play?")
+	# 	print("1. Do you want both the players to guess the same word?\n2. Do you want both the players to guess different word given by the other player?")
+	# 	while True:
+	# 		option = input("Please choose an option: ")
+	# 		if option == "1":
+	# 			self.multiplayer_type2_play()
+	# 			return
+	# 		elif option == "2":
+	# 			self.multiplayer_type1_play()
+	# 			return
+	# 		else:
+	# 			print("You have not chosen from available options, choose again!")
 
 class PlayerStart(MultiPlayer):
 				

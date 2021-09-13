@@ -2,7 +2,12 @@ import random
 import getpass
 import pandas as pd
 import os
+import sys
+sys.path.append("..") # Adds higher directory to python modules path.
+
 from difficulty import Difficulty
+from multiplayer import MultiPlayer
+from gameresults import GameResults
 
 class WordCategoryHint():
 	def __init__(self):
@@ -19,27 +24,11 @@ class Hangman(Difficulty, WordCategoryHint):
 	avail_letters = 'abcdefghijklmnopqrstuvwxyz'
 	turns_diff = {'easy': 5, 'medium': 3, 'hard' : 2}
 
-	def __init__(self, usertype, gametype):
-		self.usertype = usertype
+	def __init__(self, gametype):
 		self.gametype = gametype
-
 		self.guessed_letters = ''
 		self.name_while_guess = []
-		self.turns = 0
-		self.difficulty_level = ''
-
-		self.name = ''
-		self.row_dict = ''
-		self.random_key = ''
-		self.random_name = ''
-
-	def update_multiplayer_name(self, name):
-		self.name = name
-
-	def reset_class_vars(self):
-		self.guessed_letters = ''
-		self.name_while_guess = []
-
+		
 		if self.gametype == "multi":
 			while True:
 				self.random_name = getpass.getpass("Please enter word for {} to guess (word should be greater than or equal to 3 letters): ".format(self.name))  # mask the i/p
@@ -57,7 +46,14 @@ class Hangman(Difficulty, WordCategoryHint):
 			self.row_dict = super().get_word_row()
 			self.random_key = self.row_dict['category']
 			self.random_name = self.row_dict['word']
-			self.random_name = " ".join((self.random_name).split())			
+			self.random_name = " ".join((self.random_name).split())	
+
+		self.turns = 0
+		self.difficulty_level = ''
+		self.name = ''
+
+	def update_multiplayer_name(self, name):
+		self.name = name
 
 	def update_difficulty(self, difficultyifplayer2=''):
 		if difficultyifplayer2 != '':
@@ -65,6 +61,18 @@ class Hangman(Difficulty, WordCategoryHint):
 		else:
 			print("You get +5 chances in easy mode, +3 chances in medium mode, and +2 chances in hard mode so choose wisely! All the best!\n")
 			self.difficulty_level = super().getdifficultylevel()
+
+	def calculate_turns(self):
+		turns = 0
+		words = self.random_name.split(" ")
+		for word in words:
+			turns += len(word)
+			dashes = "_"*len(word)
+			dashes_list = list(dashes)
+			self.name_while_guess += dashes_list
+			self.name_while_guess.append(" ")
+		self.name_while_guess.pop()
+		self.turns = self.turns_diff[self.difficulty_level] + turns
 
 	def return_if_guessing_possible(self, letter_guessed):
 		if letter_guessed in self.avail_letters and len(letter_guessed) == 1:
@@ -85,17 +93,6 @@ class Hangman(Difficulty, WordCategoryHint):
 		return False
 
 	def user_game(self):
-		turns = 0
-		words = self.random_name.split(" ")
-		for word in words:
-			turns += len(word)
-			dashes = "_"*len(word)
-			dashes_list = list(dashes)
-			self.name_while_guess += dashes_list
-			self.name_while_guess.append(" ")
-		self.name_while_guess.pop()
-		self.turns = self.turns_diff[self.difficulty_level] + turns
-
 		print("\nThe word is of {} letters, number of guesses you have are: {}. [Hint: {}]".
 			format(self.turns-self.turns_diff[self.difficulty_level], self.turns, self.random_key))
 		print(' '.join(self.name_while_guess))
@@ -147,9 +144,7 @@ class Hangman(Difficulty, WordCategoryHint):
 							if "_" not in self.name_while_guess:
 								print("The word is: ", self.random_name)
 								print("\nCONGRATULATIONS, YOU WON! WOOHOO!")
-								if self.gametype == "single":
-									return 'won', self.difficulty_level
-								return 'won'
+								return 'won', self.difficulty_level
 						else:
 							self.turns -= 1
 							print("Wrong choice!")
@@ -161,12 +156,60 @@ class Hangman(Difficulty, WordCategoryHint):
 
 		print("You lost, better luck next time!")
 		print("The word was: ", self.random_name)
-		if self.gametype == "single":
-			return 'lost', self.difficulty_level
-		return 'lost'
+		return 'lost', self.difficulty_level
 
 	def __str__(self):
 		print("Hangman Game!")
+
+class BaseHangman(GameResults):	
+	def __init__(self, usertype, gametype, username=''):
+		self.usertype = usertype
+		self.gametype = gametype
+		self.username = username
+
+	def handle(self):
+		if self.gametype == "single":
+			while True:
+				play = Hangman(self.gametype)
+				play.update_difficulty()
+				play.calculate_turns()
+				result, difficulty_level = play.user_game()
+
+				if self.usertype != 'guest':
+					super().base_results(self.username, "Hangman", difficulty_level, result, True)
+					super().display_user_game_details(self.username, "Hangman")
+
+				if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
+					return
+
+		elif self.gametype == "multi":
+			multi_instance = MultiPlayer()
+			while True:
+				players = ['player1', 'player2']
+				difficulty_level = ''
+				for player in players:
+					if player == "player1":
+						name = multi_instance.player1_name()
+						print("{} playing first.".format(name))
+						play = Hangman(self.gametype)
+						play.update_multiplayer_name(name)
+						play.update_difficulty()
+
+					else:
+						name = multi_instance.player2_name()
+						print("{} playing now.".format(name))	
+						play = Hangman(self.gametype)							
+						play.update_multiplayer_name(name)
+						play.update_difficulty(difficulty_level)  # since we want player2 to have the same difficulty as player1
+
+					result, difficulty_level = play.user_game()
+					multi_instance.updatescores_type1(player, result)
+
+				multi_instance.displayscores()
+
+				if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
+					return
+
 
 
 if __name__ == '__main__':
@@ -225,7 +268,6 @@ if __name__ == '__main__':
 # 21 card game, both single and multi player
 # high low
 # coin flip
-# quote guessing game, requires web scraping, both single and multi
 
 # go through code finally at very end
 # create constants file if possible
@@ -234,3 +276,4 @@ if __name__ == '__main__':
 
 # can have special option under multiplayer list and keep all money related games there and then calculate at the end for both players across all games
 #           -- keep a track of how much both players owe each other, bets will be asked for
+#           -- show all progress will be lost when going back
