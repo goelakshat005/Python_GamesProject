@@ -17,6 +17,7 @@ from jumbledwords import BaseJumbledWords
 
 from gameresults import GameResults
 from multiplayer import MultiPlayer
+
 # creates SMTP session
 s = smtplib.SMTP('smtp.gmail.com', 587)
 # start TLS for security
@@ -92,7 +93,7 @@ class GamesScoresOptions(GameResults):
 			
 				self.game = self.multiplayer_options[option]
 				if self.game != 'Back':
-					play = self.game_objects[self.game](self.usertype, self.gametype)
+					play = self.game_objects[self.game](self.usertype, self.gametype)       # a new object is created everytime
 					play.handle()
 				else:
 					return
@@ -115,20 +116,6 @@ class GamesScoresOptions(GameResults):
 					play.handle()
 				elif self.game == 'Back':
 					return
-
-	# def multiplayer_type4_play(self):
-	# 	print("Which type of game do you wanna play?")
-	# 	print("1. Do you want both the players to guess the same word?\n2. Do you want both the players to guess different word given by the other player?")
-	# 	while True:
-	# 		option = input("Please choose an option: ")
-	# 		if option == "1":
-	# 			self.multiplayer_type2_play()
-	# 			return
-	# 		elif option == "2":
-	# 			self.multiplayer_type1_play()
-	# 			return
-	# 		else:
-	# 			print("You have not chosen from available options, choose again!")
 
 class PlayerStart(MultiPlayer):
 				

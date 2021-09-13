@@ -217,7 +217,6 @@ if __name__ == '__main__':
 	# user.display_to_user()
 
 
-# to add later - 
 # hangman name with space in between, show properly to user and process accordingly (eg. south korea)
 # login user maintaining prev scores and all (parent class)  -- done
 # play again option.  -- done
@@ -266,6 +265,7 @@ if __name__ == '__main__':
 # jumbled word -- difficulty will result in change in length of word and number of chances, both single player and multiplayer
 # number guessing game, both single player and multiplayer
 # 21 card game, both single and multi player
+# blackjack
 # high low
 # coin flip
 
@@ -273,6 +273,7 @@ if __name__ == '__main__':
 # create constants file if possible
 # check signup, password - ayush1@ not accepted
 # update emailid option
+# encrypt password in db if possible
 
 # can have special option under multiplayer list and keep all money related games there and then calculate at the end for both players across all games
 #           -- keep a track of how much both players owe each other, bets will be asked for
