@@ -198,7 +198,7 @@ class BaseJumbledWords(GameResults):
 
 				if self.usertype != 'guest':
 					super().base_results(self.username, "JumbledWords", difficulty_level, result, True)
-					super().display_user_game_details(self.username, "JumbledWords")
+					super().display_games_scores_with_win_lose(self.username, "JumbledWords")
 
 				if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
 					return

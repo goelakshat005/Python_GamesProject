@@ -179,7 +179,7 @@ class BaseHangman(GameResults):
 
 				if self.usertype != 'guest':
 					super().base_results(self.username, "Hangman", difficulty_level, result, True)
-					super().display_user_game_details(self.username, "Hangman")
+					super().display_games_scores_with_win_lose(self.username, "Hangman")
 
 				if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
 					return
@@ -261,6 +261,7 @@ if __name__ == '__main__':
 # do we create different play options for different games in startpage based on if difficulty or not  -- done
 # flames -- done
 # jumbled word -- difficulty will result in change in length of word and number of chances, both single player and multiplayer -- done
+# remember game, singleplayer and multiplayer, only need to keep the highest score, will require a different score table  -- done
 
 
 # difficulty level based on past of the user
@@ -274,7 +275,6 @@ if __name__ == '__main__':
 # blackjack
 # high low
 # coin flip
-# remember game - only multiplayer
 
 # go through code finally at very end
 # create constants file if possible

@@ -154,7 +154,7 @@ class BaseRockPaperScissor(GameResults):
 				if self.usertype != 'guest':
 					super().base_results(self.username, "RockPaperScissor", '', result, False)  # blank signifies the difficulty level and False signifies 
 					# if we need to save a game with difficulty levels
-					super().display_user_game_details(self.username, "RockPaperScissor")
+					super().display_games_scores_with_win_lose(self.username, "RockPaperScissor")
 
 				if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
 					return

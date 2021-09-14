@@ -14,6 +14,7 @@ from rockpaperscissor import BaseRockPaperScissor
 from tictactoe import BaseTicTacToe
 from flames import BaseFlames
 from jumbledwords import BaseJumbledWords 
+from memorytest import BaseMemoryTest
 
 from gameresults import GameResults
 from multiplayer import MultiPlayer
@@ -56,11 +57,14 @@ class GamesScoresOptions(GameResults):
 		"RockPaperScissor": BaseRockPaperScissor,
 		"TicTacToe": BaseTicTacToe,
 		"Flames": BaseFlames,
-		"JumbledWords": BaseJumbledWords
+		"JumbledWords": BaseJumbledWords,
+		"MemoryTest": BaseMemoryTest
 	}
 
-	singleplayer_options = {"1":"Hangman", "2":"RockPaperScissor", "3":"JumbledWords", "4":"Back"}   # for showing to user
-	multiplayer_options  = {"1":"Hangman", "2":"RockPaperScissor", "3":"TicTacToe", "4":"Flames", "5":"JumbledWords", "6":"Back"}  # for showing to user
+	singleplayer_options = {"1":"Hangman", "2":"RockPaperScissor", "3":"JumbledWords", "4":"MemoryTest", "5":"Back"}   # for showing to user
+	multiplayer_options  = {"1":"Hangman", "2":"RockPaperScissor", "3":"TicTacToe", "4":"Flames", "5":"JumbledWords", "6":"MemoryTest", "7":"Back"}  # for showing to user
+
+	singleplayer_games_with_only_scores = ["MemoryTest"]
 
 	def __init__(self, usertype, username, gametype=''):
 		self.gametype = gametype
@@ -73,7 +77,7 @@ class GamesScoresOptions(GameResults):
 		if self.usertype != 'guest':
 			single_players_games_list = list(self.singleplayer_options.values())
 			single_players_games_list.pop()
-			super().display_game_results_options(single_players_games_list, self.username)
+			super().display_game_results_options(single_players_games_list, self.singleplayer_games_with_only_scores, self.username)
 		else:
 			print("You are not a user, please select again or signup to keep a track of your records!\n")
 			
