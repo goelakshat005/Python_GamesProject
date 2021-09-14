@@ -29,6 +29,11 @@ class Hangman(Difficulty, WordCategoryHint):
 		self.guessed_letters = ''
 		self.name_while_guess = []
 		
+		self.turns = 0
+		self.difficulty_level = ''
+		self.name = ''
+
+	def get_word(self):
 		if self.gametype == "multi":
 			while True:
 				self.random_name = getpass.getpass("Please enter word for {} to guess (word should be greater than or equal to 3 letters): ".format(self.name))  # mask the i/p
@@ -37,7 +42,7 @@ class Hangman(Difficulty, WordCategoryHint):
 				print("Please enter a valid word!")
 
 			while True:
-				self.random_key = input("Please enter a hint for {}: ".format(name))
+				self.random_key = input("Please enter a hint for {}: ".format(self.name))
 				if self.random_key.isspace() == False:
 					break
 				print("Please enter a valid hint!")
@@ -48,10 +53,6 @@ class Hangman(Difficulty, WordCategoryHint):
 			self.random_name = self.row_dict['word']
 			self.random_name = " ".join((self.random_name).split())	
 
-		self.turns = 0
-		self.difficulty_level = ''
-		self.name = ''
-
 	def update_multiplayer_name(self, name):
 		self.name = name
 
@@ -59,7 +60,7 @@ class Hangman(Difficulty, WordCategoryHint):
 		if difficultyifplayer2 != '':
 			self.difficulty_level = difficultyifplayer2
 		else:
-			print("You get +5 chances in easy mode, +3 chances in medium mode, and +2 chances in hard mode so choose wisely! All the best!\n")
+			print("\nYou get +5 chances in easy mode, +3 chances in medium mode, and +2 chances in hard mode so choose wisely! All the best!")
 			self.difficulty_level = super().getdifficultylevel()
 
 	def calculate_turns(self):
@@ -172,6 +173,7 @@ class BaseHangman(GameResults):
 			while True:
 				play = Hangman(self.gametype)
 				play.update_difficulty()
+				play.get_word()
 				play.calculate_turns()
 				result, difficulty_level = play.user_game()
 
@@ -194,6 +196,8 @@ class BaseHangman(GameResults):
 						play = Hangman(self.gametype)
 						play.update_multiplayer_name(name)
 						play.update_difficulty()
+						play.get_word()
+						play.calculate_turns()
 
 					else:
 						name = multi_instance.player2_name()
@@ -201,6 +205,8 @@ class BaseHangman(GameResults):
 						play = Hangman(self.gametype)							
 						play.update_multiplayer_name(name)
 						play.update_difficulty(difficulty_level)  # since we want player2 to have the same difficulty as player1
+						play.get_word()
+						play.calculate_turns()
 
 					result, difficulty_level = play.user_game()
 					multi_instance.updatescores_type1(player, result)
@@ -254,6 +260,7 @@ if __name__ == '__main__':
 # tic tac toe  # only 2 players -- done
 # do we create different play options for different games in startpage based on if difficulty or not  -- done
 # flames -- done
+# jumbled word -- difficulty will result in change in length of word and number of chances, both single player and multiplayer -- done
 
 
 # difficulty level based on past of the user
@@ -262,18 +269,17 @@ if __name__ == '__main__':
 # last hint could cost 2 chances actually in hangman , can only be taken when the number of turns left are atleast 3 (1 for guessing, two for taking away)
 # hangman can have difficulty based on words that is rarity of letters, length of word, this is optional
 
-# jumbled word -- difficulty will result in change in length of word and number of chances, both single player and multiplayer
 # number guessing game, both single player and multiplayer
 # 21 card game, both single and multi player
 # blackjack
 # high low
 # coin flip
+# remember game - only multiplayer
 
 # go through code finally at very end
 # create constants file if possible
 # check signup, password - ayush1@ not accepted
 # update emailid option
-# encrypt password in db if possible
 
 # can have special option under multiplayer list and keep all money related games there and then calculate at the end for both players across all games
 #           -- keep a track of how much both players owe each other, bets will be asked for

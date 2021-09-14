@@ -59,8 +59,8 @@ class GamesScoresOptions(GameResults):
 		"JumbledWords": BaseJumbledWords
 	}
 
-	singleplayer_options = {"1":"Hangman", "2":"RockPaperScissor", "3":"Back"}   # for showing to user
-	multiplayer_options  = {"1":"Hangman", "2":"RockPaperScissor", "3":"TicTacToe", "4":"Flames", "5":"Back"}  # for showing to user
+	singleplayer_options = {"1":"Hangman", "2":"RockPaperScissor", "3":"JumbledWords", "4":"Back"}   # for showing to user
+	multiplayer_options  = {"1":"Hangman", "2":"RockPaperScissor", "3":"TicTacToe", "4":"Flames", "5":"JumbledWords", "6":"Back"}  # for showing to user
 
 	def __init__(self, usertype, username, gametype=''):
 		self.gametype = gametype

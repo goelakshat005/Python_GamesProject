@@ -54,9 +54,15 @@ class MultiPlayer():
 		if player == "player1":
 			self.player1score_won += 1
 			self.player2score_lost += 1
-		else:			
+		elif player == "player2":			
 			self.player2score_won += 1
 			self.player1score_lost += 1
+		elif player == "both_won":
+			self.player1score_won += 1
+			self.player2score_won += 1
+		elif player == "both_lost":
+			self.player1score_lost += 1
+			self.player2score_lost += 1
 
 	def displayscores(self):
 		print("The scores are:\n1. {}'s score: Won - {}, Lost - {}\n2. {}'s score: Won - {}, Lost - {}".
