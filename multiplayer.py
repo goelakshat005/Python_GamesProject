@@ -21,13 +21,58 @@ class MultiPlayer():
 		self.player2score_won = 0
 		self.player2score_lost = 0
 
+		self.player1_starting_amount = 0
+		self.player2_starting_amount = 0
+
 	def player1_name(self):
 		return self.player1
 
 	def player2_name(self):
 		return self.player2
-		
 
+	def get_players_starting_amounts(self, min_budget, max_budget):
+		while True:
+			amount = input("{}, please enter your budget (enter in whole numbers): ".format(self.player1))
+			if amount.isnumeric() == True:
+				if int(amount) >= min_budget and int(amount) <= max_budget:
+					self.player1_starting_amount = int(amount)
+					break
+				else:
+					print("Please enter an amount in range of {} and {}.".format(min_budget, max_budget))
+			else:
+				print("Please enter a valid number!")
+		
+		while True:
+			amount = input("{}, please enter your budget (enter in whole numbers): ".format(self.player2))
+			if amount.isnumeric() == True:
+				if int(amount) >= min_budget and int(amount) <= max_budget:
+					self.player2_starting_amount = int(amount)
+					break
+				else:
+					print("Please enter an amount in range of {} and {}.".format(min_budget, max_budget))
+			else:
+				print("Please enter a valid number!")
+
+		return self.player1_starting_amount, self.player2_starting_amount
+
+	def player1_amount(self):
+		return self.player1_starting_amount
+
+	def player2_amount(self):
+		return self.player2_starting_amount	
+
+	def change_in_player1_amount(self, change_amount, add_or_subtract):
+		if add_or_subtract == 'add':
+			self.player1_starting_amount += change_amount
+		elif add_or_subtract == 'subtract':
+			self.player1_starting_amount -= change_amount
+
+	def change_in_player2_amount(self, change_amount, add_or_subtract):
+		if add_or_subtract == 'add':
+			self.player2_starting_amount += change_amount
+		elif add_or_subtract == 'subtract':
+			self.player2_starting_amount -= change_amount
+		
 	def checkgametype(self):                           # check if 2 player game or single player 
 		print("Do you want to play:\n1. Single Player\n2. Multi Player\n3. Back")
 		while True:
@@ -50,7 +95,7 @@ class MultiPlayer():
 			else:
 				self.player2score_lost += 1
 
-	def updatescores_type2(self, player):
+	def updatescores_type2(self, player):  # in which if one player wins in a game, it is decided that other person lost, so both are simultaneous
 		if player == "player1":
 			self.player1score_won += 1
 			self.player2score_lost += 1

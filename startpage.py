@@ -16,6 +16,8 @@ from flames import BaseFlames
 from jumbledwords import BaseJumbledWords 
 from memorytest import BaseMemoryTest
 
+from moneygames import BaseMoneyGames
+
 from gameresults import GameResults
 from multiplayer import MultiPlayer
 
@@ -58,11 +60,12 @@ class GamesScoresOptions(GameResults):
 		"TicTacToe": BaseTicTacToe,
 		"Flames": BaseFlames,
 		"JumbledWords": BaseJumbledWords,
-		"MemoryTest": BaseMemoryTest
+		"MemoryTest": BaseMemoryTest,
+		"MoneyGames": BaseMoneyGames
 	}
 
 	singleplayer_options = {"1":"Hangman", "2":"RockPaperScissor", "3":"JumbledWords", "4":"MemoryTest", "5":"Back"}   # for showing to user
-	multiplayer_options  = {"1":"Hangman", "2":"RockPaperScissor", "3":"TicTacToe", "4":"Flames", "5":"JumbledWords", "6":"MemoryTest", "7":"Back"}  # for showing to user
+	multiplayer_options  = {"1":"Hangman", "2":"RockPaperScissor", "3":"TicTacToe", "4":"Flames", "5":"JumbledWords", "6":"MemoryTest", "7":"MoneyGames", "8":"Back"}  # for showing to user
 
 	singleplayer_games_with_only_scores = ["MemoryTest"]
 
