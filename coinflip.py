@@ -2,6 +2,7 @@ import random
 import getpass
 import pandas as pd
 import os
+import time
 import sys
 sys.path.append("..") # Adds higher directory to python modules path.
 
@@ -30,86 +31,74 @@ class CoinFlip():
 			return
 
 		elif self.gametype == "multi": # take care of the amount calcualtion and then send back so that changes can be made when want to play this game no more
-			print("The coin will be flipped, result can be either Heads or Tails. Both players will get a chance to choose alteratively, but before that place your bets.")
+			print("Both players will get a chance to choose alteratively, the coin will be flipped, result can be either Heads or Tails. Bets will be placed before that.")
 			print("The starting bet is of 50 and the raise can be made of 10/20/30.")
 
 			players = ["player1", "player2"]   # chances will be given alternatively
 			chance_of = "player1"
 			while True:
-				total_bet = 0
 				check_amount = 50
 				can_play, if_no_because_of_who = self.check_bet(check_amount)
 				if can_play != "yes":
 					if if_no_because_of_who == "player1":
-						print("You cannot play because {} doesn't have sufficient balance!".format(self.name1))
+						print("You cannot play because {} doesn't have sufficient balance!\n".format(self.name1))
 					elif if_no_because_of_who == "player2":
-						print("You cannot play because {} doesn't have sufficient balance!".format(self.name2))
+						print("You cannot play because {} doesn't have sufficient balance!\n".format(self.name2))
 					return self.player1_amount, self.player2_amount
 
 				self.player1_amount -= check_amount
 				self.player2_amount -= check_amount
 
-				if chance_of == "player1":
-					raise_amount, player_who_lost = self.multiplayer_raise_bet(chance_of)  # both players will bet according to their amounts , TODO
-					if player_who_lost == "":
-						choice = self.choose_side_of_coin(chance_of)
-						choice_of_player1 = choice
-						result = random.choice(list(self.coin_results.values()))
-						if result == choice_of_player1:
-							self.update_amounts("player1", raise_amount)
-						else:
-							self.update_amounts("player2", raise_amount)
-
-					elif player_who_lost == "player1":
-						self.update_amounts("player2", raise_amount)
-					
-					elif player_who_lost == "player2":
+				raise_amount, player_who_lost = self.multiplayer_raise_bet(chance_of)  # both players will bet according to their amounts , TODO
+				print("Final amount that was raised/betted:", raise_amount)
+				if player_who_lost == "":
+					choice = self.choose_side_of_coin(chance_of)
+					choice_of_player1 = choice
+					result = random.choice(list(self.coin_results.values()))
+					print("Flipping coin...")
+					time.sleep(1)
+					if result == choice_of_player1:
 						self.update_amounts("player1", raise_amount)
+					else:
+						self.update_amounts("player2", raise_amount)
 
+				elif player_who_lost == "player1":
+					self.update_amounts("player2", raise_amount)
+				
+				elif player_who_lost == "player2":
+					self.update_amounts("player1", raise_amount)
+
+
+				if chance_of == "player1":
 					chance_of = "player2"
 				
 				else:
-					raise_amount, player_who_lost = self.multiplayer_raise_bet(chance_of)  # both players will bet according to their amounts , TODO
-					if player_who_lost == "":
-						choice = self.choose_side_of_coin(chance_of)
-						choice_of_player1 = choice
-						result = random.choice(list(self.coin_results.values()))
-						if result == choice_of_player1:
-							self.update_amounts("player1", raise_amount)
-						else:
-							self.update_amounts("player2", raise_amount)
-
-					elif player_who_lost == "player1":
-						self.update_amounts("player2", raise_amount)
-					
-					elif player_who_lost == "player2":
-						self.update_amounts("player1", raise_amount)
-					
 					chance_of = "player1"	
 
-				if ((input("\nDo you want to play again? (Press y for yes), else enter any key... ")).lower()) != 'y':
+				if ((input("\nDo you want to play again? (Press y for yes), else enter any key...")).lower()) != 'y':
+					print()
 					return self.player1_amount, self.player2_amount
 
 	def update_amounts(self, player_won, raise_amount):
 		if player_won == "player1":
-			print("{} you won this round.".format(self.name1))
+			print("\n{} you won this round.".format(self.name1))
 			self.player1_amount += (2*raise_amount)
 		elif player_won == "player2":
-			print("{} you won this round.".format(self.name2))
+			print("\n{} you won this round.".format(self.name2))
 			self.player2_amount += (2*raise_amount)
 
-		print("Your final amounts are: ")
+		print("\nYour final amounts are: ")
 		print("{}: {}".format(self.name1, self.player1_amount))
-		print("{}: {}".format(self.name2, self.player2_amount))
+		print("{}: {}\n".format(self.name2, self.player2_amount))
 
 	def choose_side_of_coin(self, chance_of):
 		if chance_of == "player1":
-			print("{} Enter your choice.\n1. Heads\n2. Tails".format(self.name1))
+			print("{} enter your choice.\n1. Heads\n2. Tails".format(self.name1))
 		elif chance_of == "player2":
-			print("{} Enter your choice.\n1. Heads\n2. Tails".format(self.name2))
+			print("{} enter your choice.\n1. Heads\n2. Tails".format(self.name2))
 		
 		while True:
-			option = input("Enter your chocie: ")
+			option = input("Enter your choice: ")
 			if option in ['1','2']:
 				print("You choose:", self.coin_results[option])
 				return self.coin_results[option]
@@ -155,7 +144,7 @@ class CoinFlip():
 					player_who_wants_to_raise = "player1"
 
 		if player_who_wants_to_raise == "":
-			return 0, ""
+			return 50, ""
 
 		elif player_who_wants_to_raise != "":
 			amount_raised, value, player_who_lost = self.check_for_raise(player_who_wants_to_raise)
@@ -276,3 +265,4 @@ class BaseCoinFlip(GameResults):
 			play = CoinFlip(self.gametype, self.player1_amount, self.player2_amount)
 			play.update_multiplayer_names(self.name1, self.name2)
 			player1_amount, player2_amount = play.user_game()
+			return player1_amount, player2_amount

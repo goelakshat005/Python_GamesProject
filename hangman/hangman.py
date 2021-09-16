@@ -262,6 +262,11 @@ if __name__ == '__main__':
 # flames -- done
 # jumbled word -- difficulty will result in change in length of word and number of chances, both single player and multiplayer -- done
 # remember game, singleplayer and multiplayer, only need to keep the highest score, will require a different score table  -- done
+# coin flip --  test when amount goes low to 10/20/30 -- done
+# budget to each player  -- done
+#    - choose a game -an initial bet is placed (fixed minimum) -other player can raise (raise amount is fixed), if first player chooses not to comply that game's turn ends there -calculations
+#    - choose another game -same process as above
+#    - if no more games to play then show the final amount with each player and who owes who and what amount -- done
 
 
 # difficulty level based on past of the user
@@ -272,21 +277,15 @@ if __name__ == '__main__':
 
 # number guessing game, both single player and multiplayer
 # 21 card game, both single and multi player
-# blackjack
 # high low
-# coin flip --  test when amount goes low to 10/20/30
 
 # can have function to return name on the basis of player1 or player2, in coin flip
 # go through code finally at very end
 # create constants file if possible
 # check signup, password - ayush1@ not accepted
 # update emailid option
+# add money feature in special package games
 
 # can have special option under multiplayer list and keep all money related games there and then calculate at the end for both players across all games
 #           -- keep a track of how much both players owe each other, bets will be asked for
 #           -- show all progress will be lost when going back
-
-# budget to each player
-#    - choose a game -an initial bet is placed (fixed minimum) -other player can raise (raise amount is fixed), if first player chooses not to comply that game's turn ends there -calculations
-#    - choose another game -same process as above
-#    - if no more games to play then show the final amount with each player and who owes who and what amount

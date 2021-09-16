@@ -23,6 +23,8 @@ class MultiPlayer():
 
 		self.player1_starting_amount = 0
 		self.player2_starting_amount = 0
+		self.player1_amount = 0
+		self.player2_amount = 0
 
 	def player1_name(self):
 		return self.player1
@@ -36,6 +38,7 @@ class MultiPlayer():
 			if amount.isnumeric() == True:
 				if int(amount) >= min_budget and int(amount) <= max_budget:
 					self.player1_starting_amount = int(amount)
+					self.player1_amount = self.player1_starting_amount
 					break
 				else:
 					print("Please enter an amount in range of {} and {}.".format(min_budget, max_budget))
@@ -47,6 +50,7 @@ class MultiPlayer():
 			if amount.isnumeric() == True:
 				if int(amount) >= min_budget and int(amount) <= max_budget:
 					self.player2_starting_amount = int(amount)
+					self.player2_amount = self.player2_starting_amount
 					break
 				else:
 					print("Please enter an amount in range of {} and {}.".format(min_budget, max_budget))
@@ -55,23 +59,23 @@ class MultiPlayer():
 
 		return self.player1_starting_amount, self.player2_starting_amount
 
-	def player1_amount(self):
+	def get_player1_amount(self):
+		return self.player1_amount
+
+	def get_player2_amount(self):
+		return self.player2_amount	
+
+	def get_player1_starting_amount(self):
 		return self.player1_starting_amount
 
-	def player2_amount(self):
+	def get_player2_starting_amount(self):
 		return self.player2_starting_amount	
 
-	def change_in_player1_amount(self, change_amount, add_or_subtract):
-		if add_or_subtract == 'add':
-			self.player1_starting_amount += change_amount
-		elif add_or_subtract == 'subtract':
-			self.player1_starting_amount -= change_amount
+	def update_player1_amount(self, amount):
+		self.player1_amount = amount
 
-	def change_in_player2_amount(self, change_amount, add_or_subtract):
-		if add_or_subtract == 'add':
-			self.player2_starting_amount += change_amount
-		elif add_or_subtract == 'subtract':
-			self.player2_starting_amount -= change_amount
+	def update_player2_amount(self, amount):
+		self.player2_amount = amount
 		
 	def checkgametype(self):                           # check if 2 player game or single player 
 		print("Do you want to play:\n1. Single Player\n2. Multi Player\n3. Back")
