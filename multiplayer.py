@@ -3,6 +3,7 @@ class MultiPlayer():
 
 	def __init__(self):
 		while True:
+			print()
 			player1 = input("Please enter name for first player: ")
 			if player1.isspace() == False:
 				self.player1 = player1
@@ -25,6 +26,9 @@ class MultiPlayer():
 		self.player2_starting_amount = 0
 		self.player1_amount = 0
 		self.player2_amount = 0
+
+		self.player_who_owes = ''
+		self.amount_owed = 0
 
 	def player1_name(self):
 		return self.player1
@@ -58,6 +62,22 @@ class MultiPlayer():
 				print("Please enter a valid number!")
 
 		return self.player1_starting_amount, self.player2_starting_amount
+
+	def update_owed_vars(self):
+		if self.player1_amount < self.player1_starting_amount:
+			self.player_who_owes = 'player1'
+			self.amount_owed = self.player1_starting_amount - self.player1_amount
+		elif self.player2_amount < self.player2_starting_amount:
+			self.player_who_owes = 'player2'
+			self.amount_owed = self.player2_starting_amount - self.player2_amount
+
+	def display_owed_vars(self):
+		if self.player_who_owes == "player1":
+			print("{} owes {} amount {}$".format(self.player1, self.player2, self.amount_owed))
+		elif self.player_who_owes == "player2":
+			print("{} owes {} amount {}$".format(self.player2, self.player1, self.amount_owed))
+		else:
+			print("No one owes anyone any amount!")
 
 	def get_player1_amount(self):
 		return self.player1_amount

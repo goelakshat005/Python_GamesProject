@@ -267,6 +267,20 @@ if __name__ == '__main__':
 #    - choose a game -an initial bet is placed (fixed minimum) -other player can raise (raise amount is fixed), if first player chooses not to comply that game's turn ends there -calculations
 #    - choose another game -same process as above
 #    - if no more games to play then show the final amount with each player and who owes who and what amount -- done
+# if cards go less then 20 beyond first round, get new decks -- done
+# if there are more than one ace then get value of each ace differently from players -- done
+# even after getting the value of ace inputted by player check if it crosses 21, because player can enter 11 and it may cross 21 -- done
+# in case dealer gets an ace card 1 or 11 to be assigned to that card depends on rest of the cards (if sum of the rest of the cards is =<10 then use it as 11 -- done
+				# otherwise use it as 1, also -   -- done
+							# if more than two cards are aces then one as 11 and all other subsequent as 1 because 2 aces when taken as 11 both then sums upto 22 -- done
+# put sleep in apt positions in blackjack -- done
+# Blackjack -- done
+# can have special option under multiplayer list and keep all money related games there and then calculate at the end for both players across all games -- done
+#           -- keep a track of how much both players owe each other, bets will be asked for -- done
+#           -- show all progress will be lost when going back -- done
+
+
+
 
 
 # difficulty level based on past of the user
@@ -275,17 +289,20 @@ if __name__ == '__main__':
 # last hint could cost 2 chances actually in hangman , can only be taken when the number of turns left are atleast 3 (1 for guessing, two for taking away)
 # hangman can have difficulty based on words that is rarity of letters, length of word, this is optional
 
-# number guessing game, both single player and multiplayer
-# 21 card game, both single and multi player
+# cows and bulls game
 # high low
+# 2048 game -- only single player
 
-# can have function to return name on the basis of player1 or player2, in coin flip
+# can have function to return name on the basis of player1 or player2, in multiplayer games especially games of special package
 # go through code finally at very end
 # create constants file if possible
 # check signup, password - ayush1@ not accepted
 # update emailid option
 # add money feature in special package games
 
-# can have special option under multiplayer list and keep all money related games there and then calculate at the end for both players across all games
-#           -- keep a track of how much both players owe each other, bets will be asked for
-#           -- show all progress will be lost when going back
+
+
+
+
+# try to make multiplayer games such that any number of players can play dynamically - different project
+		# if cards go less than 20, get new decks in blackjack

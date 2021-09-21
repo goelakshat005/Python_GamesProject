@@ -249,7 +249,7 @@ class PlayerStart(MultiPlayer):
 				print("Username and/or Password you provided is/are incorrect, please enter again!\n")
 
 		print("Logging in as {}...".format(username))
-		time.sleep(1)
+		# time.sleep(1)
 		return username
 
 	def forgotpassword(self):
@@ -314,7 +314,7 @@ class PlayerStart(MultiPlayer):
 						entered = True
 						usertype = 'guest'
 						print("Logging in as a guest...")
-						time.sleep(1)
+						# time.sleep(1)
 					elif option == '4':
 						self.forgotpassword()
 					else:

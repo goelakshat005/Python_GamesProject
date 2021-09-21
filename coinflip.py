@@ -32,31 +32,32 @@ class CoinFlip():
 
 		elif self.gametype == "multi": # take care of the amount calcualtion and then send back so that changes can be made when want to play this game no more
 			print("Both players will get a chance to choose alteratively, the coin will be flipped, result can be either Heads or Tails. Bets will be placed before that.")
-			print("The starting bet is of 50 and the raise can be made of 10/20/30.")
+			print("The starting bet is of 50$ and the raise can be made of 10$/20$/30$.")
 
 			players = ["player1", "player2"]   # chances will be given alternatively
 			chance_of = "player1"
 			while True:
-				check_amount = 50
-				can_play, if_no_because_of_who = self.check_bet(check_amount)
-				if can_play != "yes":
-					if if_no_because_of_who == "player1":
-						print("You cannot play because {} doesn't have sufficient balance!\n".format(self.name1))
-					elif if_no_because_of_who == "player2":
-						print("You cannot play because {} doesn't have sufficient balance!\n".format(self.name2))
+				start_amount = 50
+				can_play, player = self.check_bet(start_amount)
+				if can_play == "no":
+					if player == "player1":				
+						print("{} you have insufficient balance to play, please consider adding amount to play!".format(self.name1))
+					elif player == "player2":
+						print("{} you have insufficient balance to play, please consider adding amount to play!".format(self.name2))
 					return self.player1_amount, self.player2_amount
 
-				self.player1_amount -= check_amount
-				self.player2_amount -= check_amount
+				self.player1_amount -= start_amount
+				self.player2_amount -= start_amount
 
-				raise_amount, player_who_lost = self.multiplayer_raise_bet(chance_of)  # both players will bet according to their amounts , TODO
-				print("Final amount that was raised/betted:", raise_amount)
+				raise_amount, player_who_lost = self.multiplayer_raise_bet(chance_of)
+				print("\nFinal amount that was raised/betted: {}$".format(raise_amount))
 				if player_who_lost == "":
 					choice = self.choose_side_of_coin(chance_of)
 					choice_of_player1 = choice
 					result = random.choice(list(self.coin_results.values()))
 					print("Flipping coin...")
 					time.sleep(1)
+					print("Coin shows:", result)
 					if result == choice_of_player1:
 						self.update_amounts("player1", raise_amount)
 					else:
@@ -88,14 +89,14 @@ class CoinFlip():
 			self.player2_amount += (2*raise_amount)
 
 		print("\nYour final amounts are: ")
-		print("{}: {}".format(self.name1, self.player1_amount))
-		print("{}: {}\n".format(self.name2, self.player2_amount))
+		print("{}: {}$".format(self.name1, self.player1_amount))
+		print("{}: {}$\n".format(self.name2, self.player2_amount))
 
 	def choose_side_of_coin(self, chance_of):
 		if chance_of == "player1":
-			print("{} enter your choice.\n1. Heads\n2. Tails".format(self.name1))
+			print("\n{} enter your choice.\n1. Heads\n2. Tails".format(self.name1))
 		elif chance_of == "player2":
-			print("{} enter your choice.\n1. Heads\n2. Tails".format(self.name2))
+			print("\n{} enter your choice.\n1. Heads\n2. Tails".format(self.name2))
 		
 		while True:
 			option = input("Enter your choice: ")
@@ -121,7 +122,7 @@ class CoinFlip():
 				print("{} you have insufficient balance for a raise!".format(self.name1))
 			elif player == "player2":
 				print("{} you have insufficient balance for a raise!".format(self.name2))
-			return 0, ""
+			return 50, ""
 
 		player_who_wants_to_raise = ""
 
@@ -167,7 +168,7 @@ class CoinFlip():
 				name_to_check_for_raise = self.name1
 
 			while True:
-				print("{} please enter the amount by which you want to raise, can be 10/20/30!".format(name_who_raised))
+				print("{} please enter the amount by which you want to raise, can be 10$/20$/30$!".format(name_who_raised))
 				amount = input()
 				if amount in ["20","30"]:
 					amount = int(amount)
@@ -197,7 +198,7 @@ class CoinFlip():
 								print("{} has insufficient balance for any further raise!".format(self.name2))
 							return amount_raised, "", ""
 						else:
-							print("{}, do you wanna raise further? (Press y for yes), else enter any key...".format(name_to_check_for_raise))
+							print("\n{}, do you wanna raise further? (Press y for yes), else enter any key...".format(name_to_check_for_raise))
 							yes_or_no = input().lower()
 							if yes_or_no == 'y':
 								if player_who_raised == "player1":
@@ -228,7 +229,7 @@ class CoinFlip():
 							print("{} has insufficient balance for any further raise!".format(self.name2))
 						return amount_raised, "", ""
 					else:
-						print("{}, do you wanna raise further? (Press y for yes), else enter any key...".format(name_to_check_for_raise))
+						print("\n{}, do you wanna raise further? (Press y for yes), else enter any key...".format(name_to_check_for_raise))
 						yes_or_no = input().lower()
 						if yes_or_no == 'y':
 							if player_who_raised == "player1":
