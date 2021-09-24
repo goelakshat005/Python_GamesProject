@@ -39,6 +39,9 @@ class GameResults:
 	db_engines = DBEngines.get_instance()
 	games_db_engine = db_engines.get_engine(DATABASES['default'])
 
+	only_score_games_requiring_most_scores = ["MemoryTest"]
+	only_score_games_requiring_least_scores = ["CowsAndBulls"]
+
 	def __init__(self):
 		pass
 
@@ -91,21 +94,38 @@ class GameResults:
 							username=username,
 							game=game)
 		df = pd.read_sql(sql=sql_query, con=self.games_db_engine)
-		if df.iloc[0]['score'] < result:
-			sql_query = SQL_QUERY_UPDATE_USER_GAME_SCORE.format(
-							user_game_details_table='user_game_details',
-							username=username,
-							game=game,
-							difficulty=difficulty,
-							score=result)
+		if game in self.only_score_games_requiring_most_scores:
+			if df.iloc[0]['score'] < result:
+				sql_query = SQL_QUERY_UPDATE_USER_GAME_SCORE.format(
+								user_game_details_table='user_game_details',
+								username=username,
+								game=game,
+								difficulty=difficulty,
+								score=result)
 
-			with self.games_db_engine.connect() as con:
-				con.execution_options(autocommit=True).execute(sql_query)
-			if df.iloc[0]['score'] != 0:
-				print("Congratulations you broke your old record!".format(df.iloc[0]['score']))
-		else:
-			print("Sorry, you couldn't break your old record!")
+				with self.games_db_engine.connect() as con:
+					con.execution_options(autocommit=True).execute(sql_query)
+				if df.iloc[0]['score'] != 0:
+					print("\nCongratulations you created a new record!")
+			else:
+				print("Sorry, you couldn't break your old record!")
 
+		elif game in self.only_score_games_requiring_least_scores:
+			if df.iloc[0]['score'] > result or df.iloc[0]['score'] == 0:
+				sql_query = SQL_QUERY_UPDATE_USER_GAME_SCORE.format(
+								user_game_details_table='user_game_details',
+								username=username,
+								game=game,
+								difficulty=difficulty,
+								score=result)
+
+				with self.games_db_engine.connect() as con:
+					con.execution_options(autocommit=True).execute(sql_query)
+				if df.iloc[0]['score'] != 0:
+					print("Congratulations you created a new record!")
+			else:
+				print("Sorry, you couldn't break your old record!")
+				
 
 	def display_game_results_options(self, avail_games, singleplayer_games_with_only_scores, username):
 		games_dict = {str(i+1): avail_games[i] for i in range(0, len(avail_games))}
@@ -156,7 +176,10 @@ class GameResults:
 			print("Please play a game to have it's scores!")	
 			return
 
-		print("Your highest score in {} is: {}".format(df.iloc[0]['game'], df.iloc[0]['score']))
+		if game in self.only_score_games_requiring_most_scores:
+			print("Your highest score in {} is: {}".format(df.iloc[0]['game'], df.iloc[0]['score']))
+		elif game in self.only_score_games_requiring_least_scores:
+			print("Your score for taking least number of tries in {} is: {}".format(df.iloc[0]['game'], df.iloc[0]['score']))
 
 	def __str__(self):
 		print("Game Results!")

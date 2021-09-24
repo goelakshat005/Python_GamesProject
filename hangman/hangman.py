@@ -278,6 +278,8 @@ if __name__ == '__main__':
 # can have special option under multiplayer list and keep all money related games there and then calculate at the end for both players across all games -- done
 #           -- keep a track of how much both players owe each other, bets will be asked for -- done
 #           -- show all progress will be lost when going back -- done
+# high low -- done
+# cows and bulls game -- done
 
 
 
@@ -289,8 +291,6 @@ if __name__ == '__main__':
 # last hint could cost 2 chances actually in hangman , can only be taken when the number of turns left are atleast 3 (1 for guessing, two for taking away)
 # hangman can have difficulty based on words that is rarity of letters, length of word, this is optional
 
-# cows and bulls game
-# high low
 # 2048 game -- only single player
 
 # can have function to return name on the basis of player1 or player2, in multiplayer games especially games of special package
@@ -299,7 +299,7 @@ if __name__ == '__main__':
 # check signup, password - ayush1@ not accepted
 # update emailid option
 # add money feature in special package games
-
+# set the flow of money games option properly
 
 
 

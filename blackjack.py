@@ -74,12 +74,12 @@ class BlackJack():
 				self.get_new_decks()
 				can_play = self.check_for_sufficient_balance("player1", self.min_bet)
 				if can_play == "no":
-					print("{} has insufficient balance, please add money to your account to play further!".format(self.name1))
+					# print("{} has insufficient balance, please add money to your account to play further!".format(self.name1))
 					return self.player1_amount, self.player2_amount
 				else:
 					can_play = self.check_for_sufficient_balance("player2", self.min_bet)
 					if can_play == "no":
-						print("{} has insufficient balance, please add money to your account to play further!".format(self.name2))
+						# print("{} has insufficient balance, please add money to your account to play further!".format(self.name2))
 						return self.player1_amount, self.player2_amount
 				
 				self.reset_bet_amounts()
@@ -130,12 +130,23 @@ class BlackJack():
 
 				self.display_final_player_amounts()
 
+				can_play = self.check_for_sufficient_balance("player1", self.min_bet)
+				if can_play == "no":
+					# print("{} has insufficient balance, please add money to your account to play further!".format(self.name1))
+					return self.player1_amount, self.player2_amount
+				else:
+					can_play = self.check_for_sufficient_balance("player2", self.min_bet)
+					if can_play == "no":
+						# print("{} has insufficient balance, please add money to your account to play further!".format(self.name2))
+						return self.player1_amount, self.player2_amount
+						
 				if ((input("\nDo you want to play again? (Press y for yes), else enter any key...")).lower()) != 'y':
 					print()
 					return self.player1_amount, self.player2_amount
 
 
 	def gamerules(self):
+		print("In this game: ")
 		print("Players make their bets.")
 		print("Players are dealt 2 cards.")
 		print("Dealer is dealt 2 cards where the second card is hidden from the players.")
@@ -495,10 +506,10 @@ class BlackJack():
 
 		# if "player1" in can_raise_players:
 		while True:
-			print("\n{}, please enter the amount by which you want to raise, enter whole numbers! (minimum bet of 50$): ".format(self.name1.capitalize()), end = "")
+			print("\n{}, please enter the amount by which you want to raise, enter whole numbers! (minimum bet of 70$): ".format(self.name1.capitalize()), end = "")
 			player1_bet = input()
 			if player1_bet.isnumeric():
-				if int(player1_bet) >= 50:
+				if int(player1_bet) >= self.min_bet:
 					can_raise1 = self.check_for_sufficient_balance("player1", int(player1_bet))
 					if can_raise1 == "no":
 						print("{}, please consider a different amount to raise, you have insufficicent balance!".format(self.name1))
@@ -513,10 +524,10 @@ class BlackJack():
 
 		# if "player2" in can_raise_players:
 		while True:
-			print("{}, please enter the amount by which you want to raise, enter whole numbers! (minimum bet of 50$): ".format(self.name2.capitalize()), end = "")
+			print("{}, please enter the amount by which you want to raise, enter whole numbers! (minimum bet of 70$): ".format(self.name2.capitalize()), end = "")
 			player2_bet = input()
 			if player2_bet.isnumeric():
-				if int(player2_bet) >= 50:
+				if int(player2_bet) >= self.min_bet:
 					can_raise2 = self.check_for_sufficient_balance("player2", int(player2_bet))
 					if can_raise2 == "no":
 						print("{}, please consider a different amount to raise, you have insufficicent balance!".format(self.name2))

@@ -31,7 +31,7 @@ class CoinFlip():
 			return
 
 		elif self.gametype == "multi": # take care of the amount calcualtion and then send back so that changes can be made when want to play this game no more
-			print("Both players will get a chance to choose alteratively, the coin will be flipped, result can be either Heads or Tails. Bets will be placed before that.")
+			print("In this game both players get a chance to choose alteratively, the coin will be flipped, result can be either Heads or Tails. Bets will be placed before that.")
 			print("The starting bet is of 50$ and the raise can be made of 10$/20$/30$.")
 
 			players = ["player1", "player2"]   # chances will be given alternatively
@@ -40,10 +40,10 @@ class CoinFlip():
 				start_amount = 50
 				can_play, player = self.check_bet(start_amount)
 				if can_play == "no":
-					if player == "player1":				
-						print("{} you have insufficient balance to play, please consider adding amount to play!".format(self.name1))
-					elif player == "player2":
-						print("{} you have insufficient balance to play, please consider adding amount to play!".format(self.name2))
+					# if player == "player1":				
+					# 	print("{} you have insufficient balance to play, please consider adding amount to play!".format(self.name1))
+					# elif player == "player2":
+					# 	print("{} you have insufficient balance to play, please consider adding amount to play!".format(self.name2))
 					return self.player1_amount, self.player2_amount
 
 				self.player1_amount -= start_amount
@@ -75,7 +75,11 @@ class CoinFlip():
 				
 				else:
 					chance_of = "player1"	
-
+				
+				can_play, player = self.check_bet(start_amount)
+				if can_play == "no":
+					return self.player1_amount, self.player2_amount
+				
 				if ((input("\nDo you want to play again? (Press y for yes), else enter any key...")).lower()) != 'y':
 					print()
 					return self.player1_amount, self.player2_amount

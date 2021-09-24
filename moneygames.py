@@ -11,6 +11,7 @@ from gameresults import GameResults
 
 from coinflip import BaseCoinFlip
 from blackjack import BaseBlackJack
+from highlow import BaseHighLow
 
 class BaseMoneyGames():
 
@@ -21,12 +22,12 @@ class BaseMoneyGames():
 
 	game_objects = {"CoinFlip": BaseCoinFlip,
 					"BlackJack": BaseBlackJack,
-					"HighLow":""
+					"HighLow": BaseHighLow
 				   }
 
 	game_starting_bet = {"CoinFlip": 50,
 						 "BlackJack": 70,
-						 "HighLow":10
+						 "HighLow": 10
 						}
 
 	games_with_only_players = ["CoinFlip"]
@@ -56,8 +57,14 @@ class BaseMoneyGames():
 		print("{} has given an initial budget of: {}$".format(self.name2, player2_starting_amount))
 
 		while True:
-			print("\nPlease choose the game you want to play from below:")
+			player1_amount_before = multi_instance.get_player1_amount()
+			player2_amount_before = multi_instance.get_player2_amount()
+			possibility = self.check_if_any_game_can_be_played(player1_amount_before, player2_amount_before)
+			if possibility == "no_possible_game":
+				break
+
 			while True:
+				print("\nPlease choose the game you want to play from below:")
 				for key, value in self.game_options.items():
 					print("{}. {}".format(key, value))
 
@@ -72,11 +79,6 @@ class BaseMoneyGames():
 				player1_amount_before = multi_instance.get_player1_amount()
 				player2_amount_before = multi_instance.get_player2_amount()
 				print("\n{} has {}$ and {} has {}$\n".format(self.name1, player1_amount_before, self.name2, player2_amount_before))
-				possibility = self.check_if_game_can_be_played(player1_amount_before, player2_amount_before)
-				if possibility == "no_possible_game":
-					break
-				elif possibility == "this_game_not_possible":
-					continue
 
 				play = self.game_objects[self.game](self.usertype, self.gametype, self.username, player1_amount_before, player2_amount_before) # a new object is created
 				play.update_multiplayer_names(self.name1, self.name2)
@@ -86,6 +88,13 @@ class BaseMoneyGames():
 				if self.game in self.games_with_only_players:
 					multi_instance.update_owed_vars()
 				multi_instance.display_owed_vars()
+				
+				possibility = self.check_if_game_can_be_played(player1_amount, player2_amount)
+				if possibility == "no_possible_game":
+					break
+				elif possibility == "this_game_not_possible":
+					continue
+
 			else:
 				break
 
@@ -123,6 +132,23 @@ class BaseMoneyGames():
 		elif player2_amount < self.game_starting_bet[self.game]:
 			print("{} you cannot play this game at this point of time, try another or add more money!".format(self.name2))
 			return "this_game_not_possible"
+
+		else:
+			return ''
+
+
+	def check_if_any_game_can_be_played(self, player1_amount, player2_amount):
+		if player1_amount < 10 and player2_amount < 10:
+			print("Both players cannot play any game at this point of time, please add money to play further!")
+			return "no_possible_game"
+
+		elif player1_amount < 10:
+			print("{}, you cannot play any game at this point of time, please add money to play further!".format(self.name1))
+			return "no_possible_game"
+
+		elif player2_amount < 10:
+			print("{} you cannot play any game at this point of time, please add money to play further!".format(self.name2))
+			return "no_possible_game"
 
 		else:
 			return ''
