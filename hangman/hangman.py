@@ -1,13 +1,10 @@
 import random
 import getpass
 import pandas as pd
-import os
-import sys
-sys.path.append("..") # Adds higher directory to python modules path.
 
-from difficulty import Difficulty
-from multiplayer import MultiPlayer
-from gameresults import GameResults
+from common.difficulty import Difficulty
+from common.multiplayer import MultiPlayer
+from common.gameresults import GameResults
 
 class WordCategoryHint():
 	def __init__(self):
@@ -21,8 +18,8 @@ class WordCategoryHint():
 		return row_list[0]
 
 class Hangman(Difficulty, WordCategoryHint):
-	avail_letters = 'abcdefghijklmnopqrstuvwxyz'
-	turns_diff = {'easy': 5, 'medium': 3, 'hard' : 2}
+	all_letters = 'abcdefghijklmnopqrstuvwxyz'
+	extra_turns_in_difficulty = {'easy': 5, 'medium': 3, 'hard' : 2}
 
 	def __init__(self, gametype):
 		self.gametype = gametype
@@ -32,26 +29,6 @@ class Hangman(Difficulty, WordCategoryHint):
 		self.turns = 0
 		self.difficulty_level = ''
 		self.name = ''
-
-	def get_word(self):
-		if self.gametype == "multi":
-			while True:
-				self.random_name = getpass.getpass("Please enter word for {} to guess (word should be greater than or equal to 3 letters): ".format(self.name))  # mask the i/p
-				if self.random_name.isspace() == False and len(self.random_name) >= 3:
-					break
-				print("Please enter a valid word!")
-
-			while True:
-				self.random_key = input("Please enter a hint for {}: ".format(self.name))
-				if self.random_key.isspace() == False:
-					break
-				print("Please enter a valid hint!")
-
-		elif self.gametype == "single":
-			self.row_dict = super().get_word_row()
-			self.random_key = self.row_dict['category']
-			self.random_name = self.row_dict['word']
-			self.random_name = " ".join((self.random_name).split())	
 
 	def update_multiplayer_name(self, name):
 		self.name = name
@@ -63,9 +40,31 @@ class Hangman(Difficulty, WordCategoryHint):
 			print("\nYou get +5 chances in easy mode, +3 chances in medium mode, and +2 chances in hard mode so choose wisely! All the best!")
 			self.difficulty_level = super().getdifficultylevel()
 
+	def get_word(self):
+		if self.gametype == "multi":
+			while True:
+				print()
+				self.word_to_guess = getpass.getpass("Please enter word for {} to guess (word should be greater than or equal to 3 letters): ".format(self.name))  # mask the i/p
+				if self.word_to_guess.isspace() == False and len(self.word_to_guess) >= 3:
+					break
+				print("Please enter a valid word!")
+
+			while True:
+				self.hint = input("Please enter a hint for {}: ".format(self.name))
+				if self.hint.isspace() == False:
+					break
+				print("Please enter a valid hint!")
+
+		elif self.gametype == "single":
+			self.row_dict = super().get_word_row()
+			self.hint = self.row_dict['category']
+			self.word_to_guess = self.row_dict['word']
+			self.word_to_guess = " ".join((self.word_to_guess).split())	
+
+
 	def calculate_turns(self):
 		turns = 0
-		words = self.random_name.split(" ")
+		words = self.word_to_guess.split(" ")
 		for word in words:
 			turns += len(word)
 			dashes = "_"*len(word)
@@ -73,10 +72,10 @@ class Hangman(Difficulty, WordCategoryHint):
 			self.name_while_guess += dashes_list
 			self.name_while_guess.append(" ")
 		self.name_while_guess.pop()
-		self.turns = self.turns_diff[self.difficulty_level] + turns
+		self.turns = self.extra_turns_in_difficulty[self.difficulty_level] + turns
 
 	def return_if_guessing_possible(self, letter_guessed):
-		if letter_guessed in self.avail_letters and len(letter_guessed) == 1:
+		if letter_guessed in self.all_letters and len(letter_guessed) == 1:
 			if letter_guessed not in self.guessed_letters:
 				self.guessed_letters += letter_guessed
 				return 'possible guess'
@@ -84,31 +83,34 @@ class Hangman(Difficulty, WordCategoryHint):
 		return 'illegal guess'
 
 	def word_after_guessing(self, letter_guessed):
-		if letter_guessed in self.random_name:
+		if letter_guessed in self.word_to_guess:
 			count = 0
-			for pos in self.random_name:
+			for pos in self.word_to_guess:
 				if pos == letter_guessed:
 					self.name_while_guess[count] = letter_guessed 		
 				count += 1
 			return True
 		return False
 
-	def user_game(self):
+	def game(self):
 		print("\nThe word is of {} letters, number of guesses you have are: {}. [Hint: {}]".
-			format(self.turns-self.turns_diff[self.difficulty_level], self.turns, self.random_key))
+			format(self.turns-self.extra_turns_in_difficulty[self.difficulty_level], self.turns, self.hint))
 		print(' '.join(self.name_while_guess))
-
+		print()
 		hints_given = 1  # as one hint is already given when shown the blank name
 
 		while self.turns > 0:
-			
 			flag = 0
-
 			while flag == 0:
 				if hints_given < 3:	
-					input_letter = (str(input("Please enter the letter you want to guess, if you want another hint press +, but will cost you one chance: "))).lower()
+					input_letter = (str(input("Please enter the letter you want to guess, if you want another hint press +, but will cost you one chance, or you can type 'giveup': "))).lower()
 				elif hints_given == 3:
-					input_letter = (str(input("Please enter the letter you want to guess, no more hints to give: "))).lower()
+					input_letter = (str(input("Please enter the letter you want to guess, no more hints to give, or you can type 'giveup': "))).lower()
+
+				if input_letter == "giveup":
+					print("You lost, better luck next time!")
+					print("The word was: ", self.word_to_guess)
+					return 'lost', self.difficulty_level
 
 				if input_letter == '+' and hints_given < 3:
 					if self.gametype == 'multi':
@@ -122,6 +124,7 @@ class Hangman(Difficulty, WordCategoryHint):
 							print("Your second hint is: {}".format(self.row_dict['hint1']))
 						elif hints_given == 2:
 							print("Your third hint is: {}".format(self.row_dict['hint2']))					
+					
 					self.turns -= 1
 					hints_given += 1
 
@@ -143,9 +146,10 @@ class Hangman(Difficulty, WordCategoryHint):
 							print("You entered the right choice!")
 				
 							if "_" not in self.name_while_guess:
-								print("The word is: ", self.random_name)
+								print("The word is: ", self.word_to_guess)
 								print("\nCONGRATULATIONS, YOU WON! WOOHOO!")
 								return 'won', self.difficulty_level
+						
 						else:
 							self.turns -= 1
 							print("Wrong choice!")
@@ -156,7 +160,7 @@ class Hangman(Difficulty, WordCategoryHint):
 				print("\nNumber of guesses left: {}".format(self.turns))
 
 		print("You lost, better luck next time!")
-		print("The word was: ", self.random_name)
+		print("The word was:", self.word_to_guess)
 		return 'lost', self.difficulty_level
 
 	def __str__(self):
@@ -175,7 +179,7 @@ class BaseHangman(GameResults):
 				play.update_difficulty()
 				play.get_word()
 				play.calculate_turns()
-				result, difficulty_level = play.user_game()
+				result, difficulty_level = play.game()
 
 				if self.usertype != 'guest':
 					super().base_results(self.username, "Hangman", difficulty_level, result, True)
@@ -201,14 +205,15 @@ class BaseHangman(GameResults):
 
 					else:
 						name = multi_instance.player2_name()
-						print("{} playing now.".format(name))	
+						print("\n{} playing now.".format(name))	
 						play = Hangman(self.gametype)							
 						play.update_multiplayer_name(name)
 						play.update_difficulty(difficulty_level)  # since we want player2 to have the same difficulty as player1
 						play.get_word()
 						play.calculate_turns()
 
-					result, difficulty_level = play.user_game()
+					result, difficulty_level = play.game()
+					print()
 					multi_instance.updatescores_type1(player, result)
 
 				multi_instance.displayscores()
@@ -217,11 +222,8 @@ class BaseHangman(GameResults):
 					return
 
 
-
-if __name__ == '__main__':
-	user = Hangman()
-	# user.display_to_user()
-
+# if __name__ == '__main__':
+# 	user = Hangman()
 
 # hangman name with space in between, show properly to user and process accordingly (eg. south korea)
 # login user maintaining prev scores and all (parent class)  -- done
@@ -280,6 +282,10 @@ if __name__ == '__main__':
 #           -- show all progress will be lost when going back -- done
 # high low -- done
 # cows and bulls game -- done
+# make username as class variable in start class -- done
+# make structure changes, get money games in one folder -- done
+# have unique emailids as well -- done
+# when otp does not match, send again or back option -- done
 
 
 
@@ -288,8 +294,6 @@ if __name__ == '__main__':
 # difficulty level based on past of the user
 # the password is stored in stars in db/ encrypted
 # write test cases if possible
-# last hint could cost 2 chances actually in hangman , can only be taken when the number of turns left are atleast 3 (1 for guessing, two for taking away)
-# hangman can have difficulty based on words that is rarity of letters, length of word, this is optional
 
 # 2048 game -- only single player
 
@@ -297,11 +301,8 @@ if __name__ == '__main__':
 # go through code finally at very end
 # create constants file if possible
 # check signup, password - ayush1@ not accepted
-# update emailid option
 # add money feature in special package games
 # set the flow of money games option properly
-
-
 
 
 # try to make multiplayer games such that any number of players can play dynamically - different project

@@ -12,7 +12,7 @@ class Difficulty():
 
 			difficulty_level = input()
 			if difficulty_level in levels:
-				print("difficulty_level: ", levels[difficulty_level])
+				print("Difficulty level chosen: ", levels[difficulty_level])
 				level_ok = True
 			else:
 				print("Wrong choice, choose again.\n")

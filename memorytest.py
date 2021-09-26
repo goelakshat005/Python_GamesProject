@@ -2,11 +2,9 @@ import random
 import getpass
 import time
 import os
-import sys
-sys.path.append("..") # Adds higher directory to python modules path.
 
-from multiplayer import MultiPlayer
-from gameresults import GameResults
+from common.multiplayer import MultiPlayer
+from common.gameresults import GameResults
 
 class MemoryTest():
 	words = { "easy": ["water", "soil", "ladder", "learn", "little", "above", "lamp", "juice", "ocean", "queen", "king", "woman", "world", "good", "week", "hybrid"],

@@ -1,17 +1,10 @@
-import random
-import getpass
-import pandas as pd
-import os
-import sys
-sys.path.append("..") # Adds higher directory to python modules path.
+from common.difficulty import Difficulty
+from common.multiplayer import MultiPlayer
+from common.gameresults import GameResults
 
-from difficulty import Difficulty
-from multiplayer import MultiPlayer
-from gameresults import GameResults
-
-from coinflip import BaseCoinFlip
-from blackjack import BaseBlackJack
-from highlow import BaseHighLow
+from moneygamespackage.coinflip import BaseCoinFlip
+from moneygamespackage.blackjack import BaseBlackJack
+from moneygamespackage.highlow import BaseHighLow
 
 class BaseMoneyGames():
 

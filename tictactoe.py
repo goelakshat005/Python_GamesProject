@@ -1,9 +1,5 @@
-import random
-import sys
-sys.path.append("..") # Adds higher directory to python modules path.
-
-from multiplayer import MultiPlayer
-from gameresults import GameResults
+from common.multiplayer import MultiPlayer
+from common.gameresults import GameResults
 
 class TicTacToe():
 

@@ -1,12 +1,8 @@
 import random
-import getpass
 import time
-import os
-import sys
-sys.path.append("..") # Adds higher directory to python modules path.
 
-from multiplayer import MultiPlayer
-from gameresults import GameResults
+from common.multiplayer import MultiPlayer
+from common.gameresults import GameResults
 
 class CowsAndBulls():
 
@@ -36,6 +32,8 @@ class CowsAndBulls():
 			else:
 				break
 		
+		print("Getting secret code.")
+		time.sleep(1)
 		guessed_code = "*"*4
 		print("\nCode:", guessed_code)
 		total_number_of_guesses = 0

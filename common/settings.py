@@ -1,5 +1,4 @@
 import os
-import logging
 
 DATABASES = {
     'local_games': {

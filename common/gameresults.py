@@ -1,6 +1,6 @@
 import pandas as pd
-from db_engines import DBEngines
-from settings import DATABASES
+from .db_engines import DBEngines  # relative imports work because we are calling in from the same working directory
+from .settings import DATABASES
 
 SQL_QUERY_USER_SPECIFIC_GAME_DETAILS = r"""
 	SELECT * FROM {user_game_details_table}
@@ -148,7 +148,7 @@ class GameResults:
 				return
 
 			else:
-				print("Incorrect option entered, please choose again!\n")
+				print("Incorrect option entered, please choose again!")
 				continue
 
 	def display_games_scores_with_win_lose(self, username, game):
@@ -156,7 +156,7 @@ class GameResults:
 		df = pd.read_sql(sql=sql_query, con=self.games_db_engine)
 		
 		if df.empty:
-			print("Please play a game to have it's scores!")
+			print("\nPlease play a game to have it's scores!")
 			return
 
 		print("\nYour scores for the game {} up till now are: \n".format(game))

@@ -1,5 +1,4 @@
 class MultiPlayer():
-	gametypes = {"1": "single", "2": "multi"}
 
 	def __init__(self):
 		while True:
@@ -96,18 +95,8 @@ class MultiPlayer():
 
 	def update_player2_amount(self, amount):
 		self.player2_amount = amount
-		
-	def checkgametype(self):                           # check if 2 player game or single player 
-		print("Do you want to play:\n1. Single Player\n2. Multi Player\n3. Back")
-		while True:
-			gametype = input()
-			if gametype in self.gametypes:
-				return self.gametypes[gametype]
-			elif gametype == "3":
-				return
-			print("Please enter a valid option!\n")
 
-	def updatescores_type1(self, player, result):
+	def updatescores_type1(self, player, result):  # one player won doesn't necessarily mean other player lost
 		if player == "player1":
 			if result == "won":
 				self.player1score_won += 1

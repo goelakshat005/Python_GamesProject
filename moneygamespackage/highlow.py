@@ -1,14 +1,9 @@
 import random
-import getpass
-import pandas as pd
-import os
 import time
-import sys
-sys.path.append("..") # Adds higher directory to python modules path.
 
-from difficulty import Difficulty
-from multiplayer import MultiPlayer
-from gameresults import GameResults
+from common.difficulty import Difficulty
+from common.multiplayer import MultiPlayer
+from common.gameresults import GameResults
 
 class HighLow():
 

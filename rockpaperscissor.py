@@ -1,10 +1,8 @@
 import random
 import getpass
-import sys
-sys.path.append("..") # Adds higher directory to python modules path.
 
-from multiplayer import MultiPlayer
-from gameresults import GameResults
+from common.multiplayer import MultiPlayer
+from common.gameresults import GameResults
 
 class RockPaperScissor():
 	choices_win_dict = {('paper','rock'):'paper', ('paper','scissor'):'scissor', ('rock','scissor'):'rock'}  # combinations and winner of that combo
@@ -19,7 +17,7 @@ class RockPaperScissor():
 		self.name1 = name1
 		self.name2 = name2
 
-	def user_game(self):
+	def game(self):
 		while True:
 			turns = input("Please enter the number of turns you would like to play (max 20): ")
 			if turns.isnumeric():
@@ -79,7 +77,7 @@ class RockPaperScissor():
 							computer_won += 1
 							print("You lost!")
 						turns -= 1
-					print("\nYour score: {}\nComputer's score: {}\n".format(player_won, computer_won))
+					print("\nYour score: {}\nComputer's score: {}".format(player_won, computer_won))
 					break
 
 				else:
@@ -149,7 +147,7 @@ class BaseRockPaperScissor(GameResults):
 		if self.gametype == "single":
 			while True:
 				play = RockPaperScissor(self.gametype)
-				result = play.user_game()
+				result = play.game()
 
 				if self.usertype != 'guest':
 					super().base_results(self.username, "RockPaperScissor", '', result, False)  # blank signifies the difficulty level and False signifies 
@@ -167,7 +165,7 @@ class BaseRockPaperScissor(GameResults):
 			play.update_multiplayer_names(name1, name2)
 			
 			while True:			
-				player_won = play.user_game()
+				player_won = play.game()
 				multi_instance.updatescores_type2(player_won)
 				multi_instance.displayscores()
 

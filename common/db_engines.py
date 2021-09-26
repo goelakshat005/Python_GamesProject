@@ -1,5 +1,3 @@
-import logging
-import os
 import sqlalchemy
 import sqlalchemy_utils as sa_utils
 
@@ -34,7 +32,7 @@ class DBEngines:
 	@classmethod
 	def create_engine(cls, db: dict, create_db: bool = False):
 		"""Create a database engine."""
-		print(db)
+		# print(db)
 		url = sqlalchemy.engine.url.URL(
 			drivername=db[ENGINE_KEY],
 			username=db[USER_KEY],
